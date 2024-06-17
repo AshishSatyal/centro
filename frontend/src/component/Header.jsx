@@ -7,7 +7,7 @@ const Header = () => {
         <h1 className='font-bold text-slate-500 sm:text-2xl lg:text-4xl capitalize'>
           centro
         </h1>
-        <div>
+        {/* <div>
           <input
             type='search'
             name=''
@@ -15,12 +15,12 @@ const Header = () => {
             placeholder='search'
             className='p-2 border-b-2 w-52'
           />
-        </div>
+        </div> */}
         <div className='flex gap-5'>
-          <button className='border-2 border-blue-500 rounded-xl w-32 h-14 font-semibold text-black'>
+          <button className='hover:bg-blue-500 border border-blue-500 hover:border-none rounded-xl w-36 h-14 font-semibold text-black text-xl hover:text-white transition-all'>
             Sign Up
           </button>
-          <button className='bg-blue-500 border rounded-xl w-32 h-14 text-white'>
+          <button className='bg-blue-500 hover:bg-white border border-blue-500 rounded-xl w-36 h-14 text-white text-xl hover:text-black transition-all'>
             Add Product
           </button>
         </div>
