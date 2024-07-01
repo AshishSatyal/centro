@@ -17,7 +17,7 @@ const Header = () => {
             className='p-2 border-b-2 w-52'
           />
         </div> */}
-        <div className='md:flex md:gap-5 sm:hidden'>
+        <div className='md:flex md:gap-5 hidden'>
           <Link
             to='/signup'
             className='flex justify-center items-center border border-blue-500 hover:border-none rounded-xl w-24 md:w-36 h-10 md:h-14 font-semibold text-black text-sm md:text-xl transition-all'
