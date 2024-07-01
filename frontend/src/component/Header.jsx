@@ -1,10 +1,11 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
-    <div className='top-0 left-0 sticky bg-white/40 px-4 border w-full h-24'>
-      <div className='flex justify-between items-center px-4 h-full'>
-        <h1 className='font-bold text-slate-500 sm:text-2xl lg:text-4xl capitalize'>
+    <div className='top-0 left-0 sticky bg-white/40 px-4 border w-full h-16 md:h-24'>
+      <div className='flex justify-between items-center md:px-4 h-full'>
+        <h1 className='font-bold text-2xl text-slate-500 lg:text-4xl capitalize'>
           centro
         </h1>
         {/* <div>
@@ -16,13 +17,19 @@ const Header = () => {
             className='p-2 border-b-2 w-52'
           />
         </div> */}
-        <div className='flex gap-5'>
-          <button className='hover:bg-blue-500 border border-blue-500 hover:border-none rounded-xl w-36 h-14 font-semibold text-black text-xl hover:text-white transition-all'>
+        <div className='md:flex md:gap-5 sm:hidden'>
+          <Link
+            to='/signup'
+            className='flex justify-center items-center border border-blue-500 hover:border-none rounded-xl w-24 md:w-36 h-10 md:h-14 font-semibold text-black text-sm md:text-xl transition-all'
+          >
             Sign Up
-          </button>
-          <button className='bg-blue-500 hover:bg-white border border-blue-500 rounded-xl w-36 h-14 text-white text-xl hover:text-black transition-all'>
-            Add Product
-          </button>
+          </Link>
+          <Link
+            to='/signup'
+            className='flex justify-center items-center border border-blue-500 hover:border-none rounded-xl w-24 md:w-36 h-10 md:h-14 font-semibold text-black text-sm md:text-xl transition-all'
+          >
+            Add product
+          </Link>
         </div>
       </div>
     </div>
