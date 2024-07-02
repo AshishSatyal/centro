@@ -7,7 +7,7 @@ import NavSmall from "./component/NavSmall";
 function App() {
   return (
     <>
-      <div className='bottom-0 fixed md:hidden w-full'>
+      <div className='bottom-1 fixed md:hidden w-full'>
         <NavSmall />
       </div>
       <Header />
