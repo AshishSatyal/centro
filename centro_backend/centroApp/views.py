@@ -1,57 +1,74 @@
-from rest_framework.response import Response
-from django.shortcuts import render
-from django.http import HttpResponse
-from rest_framework import status
-
 from rest_framework.views import APIView
-from rest_framework.authtoken.models import Token
-
+from rest_framework.response import Response
+from rest_framework.exceptions import AuthenticationFailed
 from .serializers import UserSerializer
-from django.contrib.auth.models import User
-
-# for resticting api to authinticated user
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
-
-#login 
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authtoken.models import Token
+from .models import User
+import jwt, datetime
 
 
 # Create your views here.
-
-def index(request):
-    return HttpResponse("Hello, world. You're at the myapp index.")
-
-class RegisterUser(APIView):
-    def post(self,request):
-        serializer = UserSerializer(data = request.data)
-        
-        if not serializer.is_valid():
-            return Response({'status':403,'errors':serializer.errors ,'message':'Something went wrong'})
-
-        serializer.save()
-        
-        user = User.objects.get(username = serializer.data['username'])
-        token_obj , _ = Token.objects.get_or_create(user=user)
-        
-        return Response({'status':200,'payload':serializer.data ,'token' : str(token_obj),'message':'User Created!'})
-
-
-class LoginUser(ObtainAuthToken):
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, context={'request': request})
+class RegisterView(APIView):
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({
-            'token': token.key,
-            'user_id': user.pk,
-            'email': user.email
-        }, status=status.HTTP_200_OK)
-# Used to give access to authincated users only
-# authentication_classes = [TokenAuthentication]
-# permission_classes = [IsAuthenticated]
+        serializer.save()
+        return Response(serializer.data)
 
-# while sending request to API should add in header
-# Authorization  : token <token_key>
+
+class LoginView(APIView):
+    def post(self, request):
+        email = request.data['email']
+        password = request.data['password']
+
+        user = User.objects.filter(email=email).first()
+
+        if user is None:
+            raise AuthenticationFailed('User not found!')
+
+        if not user.check_password(password):
+            raise AuthenticationFailed('Incorrect password!')
+
+        payload = {
+            'id': user.id,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+            'iat': datetime.datetime.utcnow()
+        }
+
+        # Removed .decode('utf-8') since jwt.encode returns str in pyjwt >= 2.0
+        token = jwt.encode(payload, 'secret', algorithm='HS256')
+
+        response = Response()
+
+        # Set the token as a string in the cookie and response data
+        response.set_cookie(key='jwt', value=token, httponly=True)
+        response.data = {'jwt': token}
+        return response
+
+
+
+class UserView(APIView):
+    def get(self, request):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed('Unauthenticated!')
+
+        try:
+            # Specify the algorithm(s) used for decoding
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated!')
+
+        user = User.objects.filter(id=payload['id']).first()
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+
+class LogoutView(APIView):
+    def post(self, request):
+        response = Response()
+        response.delete_cookie('jwt')
+        response.data = {
+            'message': 'success'
+        }
+        return response
