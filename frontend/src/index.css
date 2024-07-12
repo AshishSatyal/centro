@@ -48,3 +48,8 @@ select {
   margin-inline: auto;
   max-width: 1200px;
 }
+.remove-arrow::-webkit-inner-spin-button,
+.remove-arrow::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
