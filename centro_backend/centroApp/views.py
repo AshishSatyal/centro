@@ -86,6 +86,7 @@ class LogoutView(APIView):
  
 #Add/View Products   
 class ProductView(APIView):
+    permission_classes = (IsAuthenticated,)
     parser_classes = (MultiPartParser, FormParser)
     
     def post(self,request, *args, **kwargs):
@@ -102,6 +103,7 @@ class ProductView(APIView):
     
 #Delete,Update and view individual product
 class IndividualProductView(APIView):
+    permission_classes = (IsAuthenticated,)
     def get(self,request,pk):
         product = Product.objects.get(id=pk)
         serializer = ProductSerializer(product)
@@ -119,4 +121,9 @@ class IndividualProductView(APIView):
         serializer.save()
         return Response(serializer.data)
 
+class SearchProductView(APIView):
+    def get(self,request):
+        products = Product.objects.filter(name__contains=request.data['name'])
+        serializer = ProductSerializer(products,many=True)
+        return Response(serializer.data)
     
