@@ -38,7 +38,11 @@ const Signup = () => {
                     Last Name
                   </label>
                   <input
-                    {...register("lastname")}
+                    {...register("lastname", {
+                      required: true,
+                      pattern: /^[A-Za-z]+$/i,
+                      message: "This input is required",
+                    })}
                     className='focus:border-gray-800 px-2 border border-black rounded-xl w-[11rem] h-10'
                     type='text'
                     placeholder='Doe'
@@ -52,7 +56,12 @@ const Signup = () => {
                   Email
                 </label>
                 <input
-                  {...register("email")}
+                  {...register("email", {
+                    required: true,
+                    pattern:
+                      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i,
+                    message: "This email is not valid",
+                  })}
                   className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10'
                   type='text'
                   placeholder='example@gmail.com'
@@ -65,7 +74,12 @@ const Signup = () => {
                   Number
                 </label>
                 <input
-                  {...register("number")}
+                  {...register("number", {
+                    required: true,
+                    pattern: /^[0-9]{10}$/i,
+                    maxLength: 10,
+                    message: "This number is not valid",
+                  })}
                   className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10 remove-arrow'
                   type='number'
                   placeholder='9812345678'
@@ -78,7 +92,13 @@ const Signup = () => {
                   Password
                 </label>
                 <input
-                  {...register("password")}
+                  {...register("password", {
+                    required: true,
+                    pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/i,
+                    minLength: 8,
+                    message:
+                      "Password must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters",
+                  })}
                   className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10'
                   type='password'
                   placeholder='********'
@@ -91,7 +111,12 @@ const Signup = () => {
                   Confirm Password
                 </label>
                 <input
-                  {...register("confirm_password")}
+                  {...register("confirm_password", {
+                    required: true,
+                    validate: (value) =>
+                      value === document.getElementById("password").value,
+                    message: "Password does not match",
+                  })}
                   className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10'
                   type='password'
                   placeholder='********'
