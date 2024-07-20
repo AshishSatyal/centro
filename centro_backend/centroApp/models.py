@@ -39,7 +39,8 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 class User(AbstractUser):
-    name = models.CharField(max_length=255)
+    firstname = models.CharField(max_length=255)
+    lastname = models.CharField(max_length=255)
     email = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
     username = None
@@ -48,3 +49,15 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = UserManager()
+
+class Product(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    price = models.FloatField()
+    countInStock = models.IntegerField()
+    image = models.ImageField(upload_to='products/', null=True, blank=True)
+    condition = models.CharField(max_length=255)
+    sold = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
