@@ -1,9 +1,14 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import UserSerializer
-from .models import User
+from .serializers import UserSerializer,ProductSerializer
+from .models import User,Product
 import jwt, datetime
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.parsers import MultiPartParser, FormParser
+
+
 
 
 # Create your views here.
@@ -30,8 +35,8 @@ class LoginView(APIView):
 
         payload = {
             'id': user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
-            'iat': datetime.datetime.utcnow()
+            'exp': datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=60),
+            'iat': datetime.datetime.now(datetime.UTC)
         }
 
         # Removed .decode('utf-8') since jwt.encode returns str in pyjwt >= 2.0
@@ -43,8 +48,6 @@ class LoginView(APIView):
         response.set_cookie(key='jwt', value=token, httponly=True)
         response.data = {'jwt': token}
         return response
-
-
 
 class UserView(APIView):
     def get(self, request):
@@ -63,12 +66,57 @@ class UserView(APIView):
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
-
 class LogoutView(APIView):
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request):
-        response = Response()
-        response.delete_cookie('jwt')
-        response.data = {
-            'message': 'success'
-        }
-        return response
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            response = Response()
+            response.delete_cookie('jwt')
+            response.data = {
+                'message': 'success'
+            }
+            return response
+        except Exception as e:
+            return Response(status=400, data={"detail": str(e)})
+ 
+#Add/View Products   
+class ProductView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    
+    def post(self,request, *args, **kwargs):
+        serializer = ProductSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+    
+    def get(self,request):
+        products = Product.objects.all()
+        serializer = ProductSerializer(products,many=True)
+        return Response(serializer.data)
+    
+#Delete,Update and view individual product
+class IndividualProductView(APIView):
+    def get(self,request,pk):
+        product = Product.objects.get(id=pk)
+        serializer = ProductSerializer(product)
+        return Response(serializer.data)
+    
+    def delete(self,request,pk):
+        product = Product.objects.get(id=pk)
+        product.delete()
+        return Response('Product deleted successfully')
+    
+    def put(self,request,pk):
+        product = Product.objects.get(id=pk)
+        serializer = ProductSerializer(instance=product,data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    
