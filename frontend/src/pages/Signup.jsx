@@ -1,17 +1,19 @@
 import React from "react";
 import CenterComponent from "../component/CenterComponent";
+import { useForm } from "react-hook-form";
 
 const Signup = () => {
-  const handleForm = (e) => {
-    e.preventDefault();
-    console.log("Form Submitted");
+  const { register, handleSubmit } = useForm();
+
+  const onSubmit = (data) => {
+    console.log(data);
   };
   return (
     <CenterComponent>
       <div className='flex flex-col justify-center items-center border w-full h-[100vh]'>
         <h1 className='font-bold text-4xl capitalize'>signup</h1>
         <div className='py-5 border w-[25rem]'>
-          <form action='' className='w-full'>
+          <form className='w-full' onSubmit={handleSubmit(onSubmit)}>
             <div className='flex flex-col gap-2'>
               <div className='flex gap-2 px-4'>
                 <div className='flex flex-col gap-1'>
@@ -19,6 +21,11 @@ const Signup = () => {
                     First Name
                   </label>
                   <input
+                    {...register("firstname", {
+                      required: true,
+                      pattern: /^[A-Za-z]+$/i,
+                      message: "This input is required",
+                    })}
                     type='text'
                     className='focus:border-gray-800 px-2 border border-black rounded-xl w-[11rem] h-10'
                     placeholder='John'
@@ -31,6 +38,7 @@ const Signup = () => {
                     Last Name
                   </label>
                   <input
+                    {...register("lastname")}
                     className='focus:border-gray-800 px-2 border border-black rounded-xl w-[11rem] h-10'
                     type='text'
                     placeholder='Doe'
@@ -44,6 +52,7 @@ const Signup = () => {
                   Email
                 </label>
                 <input
+                  {...register("email")}
                   className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10'
                   type='text'
                   placeholder='example@gmail.com'
@@ -56,6 +65,7 @@ const Signup = () => {
                   Number
                 </label>
                 <input
+                  {...register("number")}
                   className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10 remove-arrow'
                   type='number'
                   placeholder='9812345678'
@@ -68,6 +78,7 @@ const Signup = () => {
                   Password
                 </label>
                 <input
+                  {...register("password")}
                   className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10'
                   type='password'
                   placeholder='********'
@@ -80,6 +91,7 @@ const Signup = () => {
                   Confirm Password
                 </label>
                 <input
+                  {...register("confirm_password")}
                   className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10'
                   type='password'
                   placeholder='********'
@@ -90,7 +102,6 @@ const Signup = () => {
               <div className='mt-5 px-4'>
                 <button
                   className='border border-black hover:border-black/40 rounded-xl w-[22rem] h-10 font-semibold text-xl'
-                  onClick={handleForm}
                   type='submit'
                 >
                   Submit
