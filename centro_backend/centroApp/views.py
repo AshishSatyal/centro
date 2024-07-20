@@ -121,6 +121,7 @@ class IndividualProductView(APIView):
         serializer.save()
         return Response(serializer.data)
 
+#Search Products
 class SearchProductView(APIView):
     def get(self,request):
         products = Product.objects.filter(name__contains=request.data['name'])
