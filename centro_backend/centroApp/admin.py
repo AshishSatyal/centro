@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
-from .models import User
+from .models import User,Product
 
 class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
@@ -27,3 +27,5 @@ admin.site.register(User, UserAdmin)
 
 # Unregister the Group model from admin.
 admin.site.unregister(Group)
+
+admin.site.register(Product)
