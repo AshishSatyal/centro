@@ -54,7 +54,7 @@ class Product(models.Model):
     description = models.TextField()
     price = models.FloatField()
     countInStock = models.IntegerField()
-    imageUrl = models.CharField(max_length=2083)
+    image = models.ImageField(upload_to='products/', null=True, blank=True)
     condition = models.CharField(max_length=255)
     sold = models.BooleanField(default=False)
 

@@ -6,6 +6,8 @@ from .models import User,Product
 import jwt, datetime
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.parsers import MultiPartParser, FormParser
+
 
 
 
@@ -84,11 +86,14 @@ class LogoutView(APIView):
  
 #Add/View Products   
 class ProductView(APIView):
-    def post(self,request):
+    parser_classes = (MultiPartParser, FormParser)
+    
+    def post(self,request, *args, **kwargs):
         serializer = ProductSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
     
     def get(self,request):
         products = Product.objects.all()
