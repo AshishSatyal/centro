@@ -3,10 +3,27 @@ import CenterComponent from "../component/CenterComponent";
 import { useForm } from "react-hook-form";
 
 const Signup = () => {
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    try {
+      await fetch("http://127.0.0.1:8000/centroApp/register/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+    } catch (err) {
+      setError("email", {
+        message: "Email already exists",
+      });
+    }
   };
   return (
     <CenterComponent>
@@ -22,9 +39,9 @@ const Signup = () => {
                   </label>
                   <input
                     {...register("firstname", {
-                      required: true,
+                      required: "This input is required",
                       pattern: /^[A-Za-z]+$/i,
-                      message: "This input is required",
+                      // message: "This input is required",
                     })}
                     type='text'
                     className='focus:border-gray-800 px-2 border border-black rounded-xl w-[11rem] h-10'
@@ -32,6 +49,11 @@ const Signup = () => {
                     id='firstName'
                     name='firstname'
                   />
+                  {errors.firstname && (
+                    <div className='font-semibold text-red-600 text-sm'>
+                      {errors.firstname.message}
+                    </div>
+                  )}
                 </div>
                 <div className='flex flex-col gap-1'>
                   <label htmlFor='lastName' className='font-semibold'>
@@ -39,9 +61,9 @@ const Signup = () => {
                   </label>
                   <input
                     {...register("lastname", {
-                      required: true,
+                      required: "This input is required",
                       pattern: /^[A-Za-z]+$/i,
-                      message: "This input is required",
+                      // message: "This input is required",
                     })}
                     className='focus:border-gray-800 px-2 border border-black rounded-xl w-[11rem] h-10'
                     type='text'
@@ -49,6 +71,11 @@ const Signup = () => {
                     id='lastName'
                     name='lastname'
                   />
+                  {errors.lastname && (
+                    <div className='font-semibold text-red-600 text-sm'>
+                      {errors.lastname.message}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className='flex flex-col gap-1 px-4'>
@@ -57,10 +84,13 @@ const Signup = () => {
                 </label>
                 <input
                   {...register("email", {
-                    required: true,
-                    pattern:
-                      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i,
-                    message: "This email is not valid",
+                    required: "email is not valid",
+                    validate: (value) => {
+                      if (!value.includes("@")) {
+                        return "Email is not valid";
+                      }
+                      return true;
+                    },
                   })}
                   className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10'
                   type='text'
@@ -68,6 +98,11 @@ const Signup = () => {
                   id='email'
                   name='email'
                 />
+                {errors.email && (
+                  <div className='font-semibold text-red-600 text-sm'>
+                    {errors.email.message}
+                  </div>
+                )}
               </div>
               <div className='flex flex-col gap-1 px-4'>
                 <label htmlFor='number' className='font-semibold'>
@@ -75,10 +110,10 @@ const Signup = () => {
                 </label>
                 <input
                   {...register("number", {
-                    required: true,
+                    required: "This number is not valid",
                     pattern: /^[0-9]{10}$/i,
                     maxLength: 10,
-                    message: "This number is not valid",
+                    // message: "This number is not valid",
                   })}
                   className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10 remove-arrow'
                   type='number'
@@ -86,6 +121,11 @@ const Signup = () => {
                   id='number'
                   name='number'
                 />
+                {errors.number && (
+                  <div className='font-semibold text-red-600 text-sm'>
+                    {errors.number.message}
+                  </div>
+                )}
               </div>
               <div className='flex flex-col gap-1 px-4'>
                 <label htmlFor='password' className='font-semibold'>
@@ -93,11 +133,15 @@ const Signup = () => {
                 </label>
                 <input
                   {...register("password", {
-                    required: true,
-                    pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/i,
-                    minLength: 8,
-                    message:
+                    required:
                       "Password must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters",
+                    pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
+
+                    minLength: {
+                      value: 8,
+                      message:
+                        "Password must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters",
+                    },
                   })}
                   className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10'
                   type='password'
@@ -105,6 +149,11 @@ const Signup = () => {
                   id='password'
                   name='password'
                 />
+                {errors.password && (
+                  <div className='font-semibold text-red-600 text-sm'>
+                    {errors.password.message}
+                  </div>
+                )}
               </div>
               <div className='flex flex-col gap-1 px-4'>
                 <label htmlFor='confirm_password' className='font-semibold'>
@@ -112,10 +161,10 @@ const Signup = () => {
                 </label>
                 <input
                   {...register("confirm_password", {
-                    required: true,
+                    required: "Password does not match",
                     validate: (value) =>
                       value === document.getElementById("password").value,
-                    message: "Password does not match",
+                    // message: "Password does not match",
                   })}
                   className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10'
                   type='password'
@@ -123,6 +172,11 @@ const Signup = () => {
                   id='confirm_password'
                   name='confirm_password'
                 />
+                {errors.confirm_password && (
+                  <div className='font-semibold text-red-600 text-sm'>
+                    {errors.confirm_password.message}
+                  </div>
+                )}
               </div>
               <div className='mt-5 px-4'>
                 <button
