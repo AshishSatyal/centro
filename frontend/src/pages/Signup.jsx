@@ -1,6 +1,7 @@
 import React from "react";
 import CenterComponent from "../component/CenterComponent";
 import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 
 const Signup = () => {
   const {
@@ -27,10 +28,10 @@ const Signup = () => {
   };
   return (
     <CenterComponent>
-      <div className='flex flex-col justify-center items-center border w-full h-[100vh]'>
-        <h1 className='font-bold text-4xl capitalize'>signup</h1>
-        <div className='py-5 border w-[25rem]'>
-          <form className='w-full' onSubmit={handleSubmit(onSubmit)}>
+      <div className='flex flex-col justify-center items-center w-full h-[100vh]'>
+        <h1 className='py-2 font-bold text-4xl capitalize'>signup</h1>
+        <div className='rounded-xl w-[20rem] lg:w-[25rem] boxShadow'>
+          <form className='py-5 w-full' onSubmit={handleSubmit(onSubmit)}>
             <div className='flex flex-col gap-2'>
               <div className='flex gap-2 px-4'>
                 <div className='flex flex-col gap-1'>
@@ -44,7 +45,7 @@ const Signup = () => {
                       // message: "This input is required",
                     })}
                     type='text'
-                    className='focus:border-gray-800 px-2 border border-black rounded-xl w-[11rem] h-10'
+                    className='focus:border-gray-800 px-2 border border-black rounded-xl w-[9rem] lg:w-[11rem] h-10'
                     placeholder='John'
                     id='firstName'
                     name='firstname'
@@ -65,7 +66,7 @@ const Signup = () => {
                       pattern: /^[A-Za-z]+$/i,
                       // message: "This input is required",
                     })}
-                    className='focus:border-gray-800 px-2 border border-black rounded-xl w-[11rem] h-10'
+                    className='focus:border-gray-800 px-2 border border-black rounded-xl w-[9rem] lg:w-[11rem] h-10'
                     type='text'
                     placeholder='Doe'
                     id='lastName'
@@ -92,7 +93,7 @@ const Signup = () => {
                       return true;
                     },
                   })}
-                  className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10'
+                  className='focus:border-gray-800 px-2 border border-black rounded-xl w-[18rem] lg:w-[22rem] h-10'
                   type='text'
                   placeholder='example@gmail.com'
                   id='email'
@@ -115,7 +116,7 @@ const Signup = () => {
                     maxLength: 10,
                     // message: "This number is not valid",
                   })}
-                  className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10 remove-arrow'
+                  className='focus:border-gray-800 px-2 border border-black rounded-xl w-[18rem] lg:w-[22rem] h-10 remove-arrow'
                   type='number'
                   placeholder='9812345678'
                   id='number'
@@ -143,7 +144,7 @@ const Signup = () => {
                         "Password must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters",
                     },
                   })}
-                  className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10'
+                  className='focus:border-gray-800 px-2 border border-black rounded-xl w-[18rem] lg:w-[22rem] h-10'
                   type='password'
                   placeholder='********'
                   id='password'
@@ -166,7 +167,7 @@ const Signup = () => {
                       value === document.getElementById("password").value,
                     // message: "Password does not match",
                   })}
-                  className='focus:border-gray-800 px-2 border border-black rounded-xl w-[22rem] h-10'
+                  className='focus:border-gray-800 px-2 border border-black rounded-xl w-[18rem] lg:w-[22rem] h-10'
                   type='password'
                   placeholder='********'
                   id='confirm_password'
@@ -180,7 +181,7 @@ const Signup = () => {
               </div>
               <div className='mt-5 px-4'>
                 <button
-                  className='border border-black hover:border-black/40 rounded-xl w-[22rem] h-10 font-semibold text-xl'
+                  className='border border-black hover:border-black/40 rounded-xl w-[18rem] lg:w-[22rem] h-10 font-semibold text-xl'
                   type='submit'
                 >
                   Submit
@@ -188,6 +189,16 @@ const Signup = () => {
               </div>
             </div>
           </form>
+          <div className='mt-3 text-center'>
+            <Link className='font-semibold text-sm' to='/login'>
+              Already Signed Up? Login
+            </Link>
+            <Link to='/'>
+              <p className='my-2 font-semibold text-sm'>
+                Continue Without Registering
+              </p>
+            </Link>
+          </div>
         </div>
       </div>
     </CenterComponent>
