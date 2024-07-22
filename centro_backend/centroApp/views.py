@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.parsers import MultiPartParser, FormParser
 
+from rest_framework import generics
+from rest_framework.permissions import AllowAny
 
 
 
@@ -85,7 +87,7 @@ class LogoutView(APIView):
  
 #Add/View Products   
 class ProductView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     parser_classes = (MultiPartParser, FormParser)
     
     def post(self,request, *args, **kwargs):
