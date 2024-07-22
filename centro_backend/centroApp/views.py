@@ -8,6 +8,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.parsers import MultiPartParser, FormParser
 
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from rest_framework import generics,status
+from rest_framework.permissions import AllowAny
+import os
+
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
 
 
 
