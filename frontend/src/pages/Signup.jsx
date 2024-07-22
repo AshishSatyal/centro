@@ -189,12 +189,14 @@ const Signup = () => {
               </div>
             </div>
           </form>
-          <div className='mt-5 text-center'>
+          <div className='mt-3 text-center'>
             <Link className='font-semibold text-sm' to='/login'>
               Already Signed Up? Login
             </Link>
-            <Link to='forget_password'>
-              <p className='mt-2 font-semibold text-sm'>Forget Password?</p>
+            <Link to='/'>
+              <p className='my-2 font-semibold text-sm'>
+                Continue Without Registering
+              </p>
             </Link>
           </div>
         </div>
