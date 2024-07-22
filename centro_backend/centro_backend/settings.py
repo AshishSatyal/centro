@@ -21,6 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 BASE_DIR = Path(__file__).resolve().parent.parent
+TEMPLATE_DIR = Path(BASE_DIR/'templates')
 MEDIA_ROOT = Path(BASE_DIR/'media')
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -68,7 +69,7 @@ ROOT_URLCONF = 'centro_backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATE_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -176,3 +177,15 @@ AUTH_USER_MODEL = 'centroApp.User'
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
+
+PASSWORD_RESET_BASE_URL = os.getenv('PASSWORD_RESET_BASE_URL', 'http://localhost:5173/reset-password')
+
+
+#SMTP Configuration
+EMAIL_HOST ='smtp-relay.brevo.com'
+EMAIL_PORT =587
+EMAIL_USE_TLS =True
+EMAIL_HOST_USER ='xayush.tc@gmail.com'
+EMAIL_HOST_PASSWORD ='fnXO2zsLFkTj3Kmr'
+
+DEFAULT_FROM_EMAIL ='xayush.tc@gmail.com'

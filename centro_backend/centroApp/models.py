@@ -2,18 +2,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
-# Create your models here.
-# class User(AbstractUser):
-#     name = models.CharField(max_length=255)
-#     email = models.CharField(max_length=255, unique=True)
-#     password = models.CharField(max_length=255)
-#     username = None
-
-#     USERNAME_FIELD = 'email'
-#     REQUIRED_FIELDS = []
-
 from django.contrib.auth.models import BaseUserManager, AbstractUser
 from django.db import models
+
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -61,3 +52,8 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    
+class PasswordReset(models.Model):
+    email = models.EmailField()
+    token = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
