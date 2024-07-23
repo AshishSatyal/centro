@@ -131,10 +131,12 @@ class IndividualProductView(APIView):
 
 #Search Products
 class SearchProductView(APIView):
+    permission_classes = (IsAuthenticated,)
     def get(self,request):
         products = Product.objects.filter(name__contains=request.data['name'])
         serializer = ProductSerializer(products,many=True)
         return Response(serializer.data)
+
 class RequestPasswordReset(generics.GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = ResetPasswordRequestSerializer
