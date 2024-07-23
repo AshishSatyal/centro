@@ -8,8 +8,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.parsers import MultiPartParser, FormParser
 
-from rest_framework import generics
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from rest_framework import generics,status
 from rest_framework.permissions import AllowAny
+import os
+
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
 
 
 
@@ -124,10 +131,12 @@ class IndividualProductView(APIView):
 
 #Search Products
 class SearchProductView(APIView):
+    permission_classes = (IsAuthenticated,)
     def get(self,request):
         products = Product.objects.filter(name__contains=request.data['name'])
         serializer = ProductSerializer(products,many=True)
         return Response(serializer.data)
+
 class RequestPasswordReset(generics.GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = ResetPasswordRequestSerializer
