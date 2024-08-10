@@ -53,6 +53,14 @@ class Product(models.Model):
     def __str__(self):
         return self.name
     
+class UserLocation(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    
+    def __str__(self):
+        return self.user_id.email
+    
 class PasswordReset(models.Model):
     email = models.EmailField()
     token = models.CharField(max_length=100)
