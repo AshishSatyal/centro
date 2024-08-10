@@ -18,6 +18,9 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
 
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer
+import numpy as np
 
 
 # Create your views here.
@@ -209,3 +212,38 @@ class ResetPassword(generics.GenericAPIView):
             return Response({'success':'Password updated'})
         else: 
             return Response({'error':'No user found'}, status=404)
+        
+# def calculate_cosine_similarity(vector1, vector2):
+#     return cosine_similarity([vector1], [vector2])[0][0]
+
+def text_to_vector(texts):
+    vectorizer = TfidfVectorizer()
+    return vectorizer.fit_transform(texts)
+
+class SimilarityAPIView(APIView):
+
+    def get(self, request, format=None):
+        products = Product.objects.all()
+        if products.count() < 2:
+            return Response({"message": "Not enough products to calculate similarity"}, status=status.HTTP_400_BAD_REQUEST)
+
+        product_list = [p.name for p in products]
+        vectors = text_to_vector(product_list)
+
+        similarity_matrix = cosine_similarity(vectors)
+        response_data = []
+
+        for i, product in enumerate(products):
+            similar_products = []
+            for j, other_product in enumerate(products):
+                if i != j:
+                    similar_products.append({
+                        "product_id": other_product.id,
+                        "similarity_score": similarity_matrix[i][j]
+                    })
+            response_data.append({
+                "product_id": product.id,
+                "similar_products": similar_products
+            })
+
+        return Response(response_data)
