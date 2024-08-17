@@ -49,6 +49,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to='products/', null=True, blank=True)
     condition = models.CharField(max_length=255)
     sold = models.BooleanField(default=False)
+    userName = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
