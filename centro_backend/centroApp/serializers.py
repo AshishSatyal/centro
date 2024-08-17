@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User,Product
+from .models import User,Product,UserLocation
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -34,3 +34,11 @@ class ResetPasswordSerializer(serializers.Serializer):
     new_password =  serializers.CharField(write_only=True, required=True)
     confirm_password = serializers.CharField(write_only=True, required=True)
     token = serializers.CharField(write_only=True, required=True)
+    
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserLocation
+        fields = ['latitude', 'longitude']
+    
+    def create(self, validated_data):
+        return UserLocation.objects.create(**validated_data)
