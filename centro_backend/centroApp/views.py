@@ -95,7 +95,7 @@ class LogoutView(APIView):
  
 #Add/View Products   
 class ProductView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     parser_classes = (MultiPartParser, FormParser)
     
     def post(self,request, *args, **kwargs):
