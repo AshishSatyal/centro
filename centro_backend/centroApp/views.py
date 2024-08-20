@@ -30,11 +30,10 @@ class RegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
-
 class LoginView(APIView):
     def post(self, request):
-        email = request.data['email']
-        password = request.data['password']
+        email = request.data.get('email')
+        password = request.data.get('password')
 
         user = User.objects.filter(email=email).first()
 
@@ -44,21 +43,20 @@ class LoginView(APIView):
         if not user.check_password(password):
             raise AuthenticationFailed('Incorrect password!')
 
-        payload = {
-            'id': user.id,
-            'exp': datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=60),
-            'iat': datetime.datetime.now(datetime.UTC)
-        }
-
-        # Removed .decode('utf-8') since jwt.encode returns str in pyjwt >= 2.0
-        token = jwt.encode(payload, 'secret', algorithm='HS256')
+        # Generate tokens using Simple JWT
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
 
         response = Response()
-
-        # Set the token as a string in the cookie and response data
-        response.set_cookie(key='jwt', value=token, httponly=True)
-        response.data = {'jwt': token}
+        response.set_cookie(key='access', value=access_token, httponly=True)
+        response.set_cookie(key='refresh', value=refresh_token, httponly=True)
+        response.data = {
+            'access': access_token,
+            'refresh': refresh_token
+        }
         return response
+
 
 class UserView(APIView):
     def get(self, request):
@@ -97,7 +95,7 @@ class LogoutView(APIView):
  
 #Add/View Products   
 class ProductView(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     parser_classes = (MultiPartParser, FormParser)
     
     def post(self,request, *args, **kwargs):
@@ -213,8 +211,8 @@ class ResetPassword(generics.GenericAPIView):
         else: 
             return Response({'error':'No user found'}, status=404)
         
-# def calculate_cosine_similarity(vector1, vector2):
-#     return cosine_similarity([vector1], [vector2])[0][0]
+def calculate_cosine_similarity(vector1, vector2):
+    return cosine_similarity([vector1], [vector2])[0][0]
 
 def text_to_vector(texts):
     vectorizer = TfidfVectorizer()
