@@ -56,3 +56,11 @@ select {
 .boxShadow {
   box-shadow: rgba(0, 0, 0, 0.2) 0px 20px 30px;
 }
+.active-nav {
+  @apply border-white text-white bg-black;
+}
+.premium-txt {
+  background: -webkit-linear-gradient(rgb(134, 129, 167), rgb(9, 54, 117));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

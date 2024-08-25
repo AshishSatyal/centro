@@ -104,7 +104,7 @@ class ProductView(APIView):
     
 #Delete,Update and view individual product
 class IndividualProductView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     def get(self,request,pk):
         product = Product.objects.get(id=pk)
         serializer = ProductSerializer(product)

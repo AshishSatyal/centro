@@ -19,6 +19,21 @@ const AddProduct = () => {
     locationDescription: undefined,
   });
 
+  const handleSubmit = async () => {
+    console.log("clicking");
+    try {
+      await fetch("http://127.0.0.1:8000/centroApp/Product/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formdata),
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   function handleChange(e) {
     const { name, value } = e.target;
     setFormData((preValues) => {
@@ -69,16 +84,26 @@ const AddProduct = () => {
               >
                 Back
               </button>
-              <button
-                className='bg-slate-200 rounded-xl w-24 h-10'
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActiveStep(activeStep + 1);
-                }}
-                type='button'
-              >
-                Next
-              </button>
+              {activeStep == 3 ? (
+                <button
+                  className='bg-slate-200 rounded-xl w-24 h-10'
+                  onClick={(e) => handleSubmit()}
+                  type='submit'
+                >
+                  Submit
+                </button>
+              ) : (
+                <button
+                  className='bg-slate-200 rounded-xl w-24 h-10'
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveStep(activeStep + 1);
+                  }}
+                  type='button'
+                >
+                  Next
+                </button>
+              )}
             </div>
           </form>
         </div>

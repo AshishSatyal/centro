@@ -8,6 +8,8 @@ import Login from "./pages/Login.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 import Product from "./pages/Product.jsx";
+import AddProduct from "./pages/AddProduct.jsx";
+import ProductPage from "./pages/ProductPage.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -19,6 +21,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path='/forgotpassword' element={<ForgotPassword />} />
         <Route path={`/reset-password`} element={<ResetPassword />} />
         <Route path={`/product`} element={<Product />} />
+        <Route path={`/add-product`} element={<AddProduct />} />
+        <Route path={`/product/:id`} element={<ProductPage />} />
       </Routes>
     </Router>
   </React.StrictMode>

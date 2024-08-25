@@ -3,6 +3,9 @@ import { useState } from "react";
 import "./App.css";
 import Header from "./component/Header";
 import NavSmall from "./component/NavSmall";
+import Product from "./pages/Product";
+import Sidebar from "./component/Sidebar";
+import Trending from "./component/Trending";
 
 function App() {
   return (
@@ -11,6 +14,11 @@ function App() {
         <NavSmall />
       </div>
       <Header />
+      <div className='flex justify-start gap-2'>
+        <Sidebar />
+        <Product />
+        <Trending />
+      </div>
     </>
   );
 }
