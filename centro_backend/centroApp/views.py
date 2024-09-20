@@ -124,10 +124,12 @@ class IndividualProductView(APIView):
 
 #Search Products
 class SearchProductView(APIView):
-    def get(self,request):
-        products = Product.objects.filter(name__contains=request.data['name'])
-        serializer = ProductSerializer(products,many=True)
-        return Response(serializer.data)
+     def get(self, request):
+       product_name = request.query_params.get('name', '')  # Retrieve the 'name' parameter from the query string
+       products = Product.objects.filter(name__icontains=product_name)  # Use 'icontains' for case-insensitive matching
+       serializer = ProductSerializer(products, many=True)
+       return Response(serializer.data)
+
 class RequestPasswordReset(generics.GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = ResetPasswordRequestSerializer

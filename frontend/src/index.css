@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  font-family: "poppins";
+}
+
 /* ------ */
 /* reset */
 /* ------ */

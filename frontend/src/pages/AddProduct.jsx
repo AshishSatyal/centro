@@ -48,7 +48,7 @@ const AddProduct = () => {
 
   return (
     <CenterComponent>
-      <div className='flex flex-col justify-center items-center my-5 w-full'>
+      <div className='flex flex-col items-center my-5 mr-40'>
         <h1 className='my-5 font-serif text-3xl capitalize'>Add a product</h1>
 
         <div className='px-2 w-5/12'>

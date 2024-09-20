@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ProductItem from "../component/ProductItem";
+import CenterComponent from "../component/CenterComponent";
 
 const SearchResults = () => {
   const { query } = useParams(); // Extract the query parameter from the URL
@@ -31,14 +32,16 @@ const SearchResults = () => {
   }, [query]);
 
   return (
-    <div className='search-results'>
-      <h1>Search Results for "{query}"</h1>
-      {loading && <p>Loading...</p>}
+    <CenterComponent>
+      <div className='search-results'>
+        <h1>Search Results for "{query}"</h1>
+        {loading && <p>Loading...</p>}
 
-      {results?.map((item) => (
-        <ProductItem key={item.id} product={item} />
-      ))}
-    </div>
+        {results?.map((item) => (
+          <ProductItem key={item.id} product={item} />
+        ))}
+      </div>
+    </CenterComponent>
   );
 };
 

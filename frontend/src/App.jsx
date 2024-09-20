@@ -13,9 +13,7 @@ function App() {
       <div className='bottom-1 fixed md:hidden w-full'>
         <NavSmall />
       </div>
-      <Header />
-      <div className='flex justify-start gap-2'>
-        <Sidebar />
+      <div className='flex justify-around'>
         <Product />
         <Trending />
       </div>

@@ -6,7 +6,7 @@ const Links = ({ name, href }) => {
     <NavLink
       to={href}
       className={({ isActive }) => {
-        return `text-xl py-1 w-full border h-10 rounded-xl px-4 capitalize ${
+        return `text-lg  py-1 w-full border h-10 rounded-xl px-4 capitalize ${
           isActive ? "active-nav" : {}
         }`;
       }}
