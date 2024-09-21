@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .serializers import UserSerializer,ProductSerializer,ResetPasswordRequestSerializer,\
-    ResetPasswordSerializer,LocationSerializer,UserProductId
+    ResetPasswordSerializer,LocationSerializer,UserProductIdSerializer
 from .models import User,Product,PasswordReset,UserLocation
 import jwt, datetime
 from rest_framework.permissions import IsAuthenticated
@@ -291,19 +291,18 @@ class MidpointView(APIView):
             return Response({"error": "User location not found."}, status=status.HTTP_404_NOT_FOUND)
 
         # Validate and extract location from the POST request
-        serializer = UserProductId(data=request.data)
+        serializer = UserProductIdSerializer(data=request.data)
         print("Request Data:", request.data)
         if serializer.is_valid():
-            print("Errors",serializer.errors)
-            user_id = serializer.validated_data.get('id')
-            print("User id",user_id)
-            user_email = UserLocation.objects.get(user_id=user_id)
-            print("Product location",user_email.latitude)
-            print("Product location",user_email.longitude)
+            product_id = serializer.validated_data.get('id')
+
+            user_id = Product.objects.get(id=product_id).userName_id
+
+            userProduct_location = UserLocation.objects.get(user_id=user_id)
             
             # Extract user's latitude and longitude via frontend request
-            provided_lat = user_email.latitude
-            provided_lon = user_email.longitude
+            provided_lat = userProduct_location.latitude
+            provided_lon = userProduct_location.longitude
 
             # Extract user's latitude and longitude
             user_lat = user_location.latitude
@@ -312,34 +311,15 @@ class MidpointView(APIView):
             # Calculate the midpoint
             midpoint = find_midpoint(user_lat, user_lon, provided_lat, provided_lon)
 
+            # return Response({
+            #     "user_lat":user_lat,
+            #     "user_lon":user_lon,
+            #     "midpoint_latitude": midpoint[0],
+            #     "midpoint_longitude": midpoint[1]
+            # })
             return Response({
-                "user_lat":user_lat,
-                "user_lon":user_lon,
                 "midpoint_latitude": midpoint[0],
                 "midpoint_longitude": midpoint[1]
             })
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# class MidpointView(APIView):
-#     def get(self, request, format=None):
-#         # Fetch all locations from the UserLocation model
-#         locations = UserLocation.objects.all()
-
-#         # Check if we have exactly 2 locations
-#         if locations.count() != 2:
-#             return Response({"error": "Exactly two locations are required."}, status=status.HTTP_400_BAD_REQUEST)
-
-#         # Extract latitude and longitude from the fetched locations
-#         location_list = locations.values('latitude', 'longitude')
-#         lat1, lon1 = location_list[0]['latitude'], location_list[0]['longitude']
-#         lat2, lon2 = location_list[1]['latitude'], location_list[1]['longitude']
-
-#         # Calculate the midpoint
-#         midpoint = find_midpoint(lat1, lon1, lat2, lon2)
-
-#         return Response({
-#             "locations": location_list,
-#             "midpoint_latitude": midpoint[0],
-#             "midpoint_longitude": midpoint[1]
-#         })
