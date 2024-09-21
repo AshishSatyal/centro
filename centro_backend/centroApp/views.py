@@ -113,7 +113,7 @@ class ProductView(APIView):
     
 #Delete,Update and view individual product
 class IndividualProductView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     def get(self,request,pk):
         product = Product.objects.get(id=pk)
         serializer = ProductSerializer(product)
@@ -133,11 +133,13 @@ class IndividualProductView(APIView):
 
 #Search Products
 class SearchProductView(APIView):
-    permission_classes = (IsAuthenticated,)
-    def get(self,request):
-        products = Product.objects.filter(name__contains=request.data['name'])
-        serializer = ProductSerializer(products,many=True)
-        return Response(serializer.data)
+     permission_classes = (IsAuthenticated,)
+def get(self, request):
+       product_name = request.query_params.get('name', '')  # Retrieve the 'name' parameter from the query string
+       products = Product.objects.filter(name__icontains=product_name)  # Use 'icontains' for case-insensitive matching
+       serializer = ProductSerializer(products, many=True)
+       return Response(serializer.data)
+
 
 class RequestPasswordReset(generics.GenericAPIView):
     permission_classes = [AllowAny]

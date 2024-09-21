@@ -1,9 +1,10 @@
 import React from "react";
 import CenterComponent from "../component/CenterComponent";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -13,13 +14,20 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     try {
-      await fetch("http://127.0.0.1:8000/centroApp/login/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        "http://127.0.0.1:8000/centroApp/login/",
+
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+      if (response.ok) {
+        navigate("/");
+      }
     } catch (err) {
       setError("email", {
         message: "Invalid email or password",
