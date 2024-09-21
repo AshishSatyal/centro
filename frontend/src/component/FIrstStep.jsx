@@ -7,9 +7,9 @@ const FIrstStep = ({ values, handleChange }) => {
         <label htmlFor='title'>Title of a product</label>
         <input
           type='text'
-          name='title'
-          value={values.title}
-          id='title'
+          name='name'
+          value={values.name}
+          id='name'
           onChange={handleChange}
           className='px-2 border rounded-xl w-full h-10'
           placeholder='Title'
