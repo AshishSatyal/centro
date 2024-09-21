@@ -1,7 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import UserSerializer,ProductSerializer,ResetPasswordRequestSerializer,ResetPasswordSerializer,LocationSerializer
+from .serializers import UserSerializer,ProductSerializer,ResetPasswordRequestSerializer,\
+    ResetPasswordSerializer,LocationSerializer,UserProductIdSerializer
 from .models import User,Product,PasswordReset,UserLocation
 import jwt, datetime
 from rest_framework.permissions import IsAuthenticated
@@ -30,11 +31,10 @@ class RegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
-
 class LoginView(APIView):
     def post(self, request):
-        email = request.data['email']
-        password = request.data['password']
+        email = request.data.get('email')
+        password = request.data.get('password')
 
         user = User.objects.filter(email=email).first()
 
@@ -44,21 +44,20 @@ class LoginView(APIView):
         if not user.check_password(password):
             raise AuthenticationFailed('Incorrect password!')
 
-        payload = {
-            'id': user.id,
-            'exp': datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=60),
-            'iat': datetime.datetime.now(datetime.UTC)
-        }
-
-        # Removed .decode('utf-8') since jwt.encode returns str in pyjwt >= 2.0
-        token = jwt.encode(payload, 'secret', algorithm='HS256')
+        # Generate tokens using Simple JWT
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
 
         response = Response()
-
-        # Set the token as a string in the cookie and response data
-        response.set_cookie(key='jwt', value=token, httponly=True)
-        response.data = {'jwt': token}
+        response.set_cookie(key='access', value=access_token, httponly=True)
+        response.set_cookie(key='refresh', value=refresh_token, httponly=True)
+        response.data = {
+            'access': access_token,
+            'refresh': refresh_token
+        }
         return response
+
 
 class UserView(APIView):
     def get(self, request):
@@ -215,8 +214,8 @@ class ResetPassword(generics.GenericAPIView):
         else: 
             return Response({'error':'No user found'}, status=404)
         
-# def calculate_cosine_similarity(vector1, vector2):
-#     return cosine_similarity([vector1], [vector2])[0][0]
+def calculate_cosine_similarity(vector1, vector2):
+    return cosine_similarity([vector1], [vector2])[0][0]
 
 def text_to_vector(texts):
     vectorizer = TfidfVectorizer()
@@ -289,51 +288,40 @@ class MidpointView(APIView):
     def post(self, request, format=None):
         # Get the currently logged-in user's location
         try:
-            user_location = UserLocation.objects.get(user_id=request.user)
+            user_location = UserLocation.objects.get(user=request.user)
         except UserLocation.DoesNotExist:
             return Response({"error": "User location not found."}, status=status.HTTP_404_NOT_FOUND)
 
         # Validate and extract location from the POST request
-        serializer = LocationSerializer(data=request.data)
+        serializer = UserProductIdSerializer(data=request.data)
+        print("Request Data:", request.data)
         if serializer.is_valid():
-            provided_lat = serializer.validated_data['latitude']
-            provided_lon = serializer.validated_data['longitude']
+            product_id = serializer.validated_data.get('id')
+
+            user_id = Product.objects.get(id=product_id).userName_id
+
+            userProduct_location = UserLocation.objects.get(user_id=user_id)
+            
+            # Extract user's latitude and longitude via frontend request
+            provided_lat = userProduct_location.latitude
+            provided_lon = userProduct_location.longitude
 
             # Extract user's latitude and longitude
             user_lat = user_location.latitude
             user_lon = user_location.longitude
 
-            # Calculate the midpoint
+            # Calculate the midpoint from two users locations
             midpoint = find_midpoint(user_lat, user_lon, provided_lat, provided_lon)
 
+            # return Response({
+            #     "user_lat":user_lat,
+            #     "user_lon":user_lon,
+            #     "midpoint_latitude": midpoint[0],
+            #     "midpoint_longitude": midpoint[1]
+            # })
             return Response({
-                "user_lat":user_lat,
-                "user_lon":user_lon,
                 "midpoint_latitude": midpoint[0],
                 "midpoint_longitude": midpoint[1]
             })
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# class MidpointView(APIView):
-#     def get(self, request, format=None):
-#         # Fetch all locations from the UserLocation model
-#         locations = UserLocation.objects.all()
-
-#         # Check if we have exactly 2 locations
-#         if locations.count() != 2:
-#             return Response({"error": "Exactly two locations are required."}, status=status.HTTP_400_BAD_REQUEST)
-
-#         # Extract latitude and longitude from the fetched locations
-#         location_list = locations.values('latitude', 'longitude')
-#         lat1, lon1 = location_list[0]['latitude'], location_list[0]['longitude']
-#         lat2, lon2 = location_list[1]['latitude'], location_list[1]['longitude']
-
-#         # Calculate the midpoint
-#         midpoint = find_midpoint(lat1, lon1, lat2, lon2)
-
-#         return Response({
-#             "locations": location_list,
-#             "midpoint_latitude": midpoint[0],
-#             "midpoint_longitude": midpoint[1]
-#         })
