@@ -46,8 +46,13 @@ class ResetPasswordSerializer(serializers.Serializer):
     
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserLocation
-        fields = ['latitude', 'longitude']
+        # model = UserLocation
+        # fields = ['latitude', 'longitude']
+        model = Product
+        fields = ['id']
     
     def create(self, validated_data):
         return UserLocation.objects.create(**validated_data)
+    
+class UserProductId(serializers.Serializer):
+    id = serializers.IntegerField()

@@ -1,7 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import UserSerializer,ProductSerializer,ResetPasswordRequestSerializer,ResetPasswordSerializer,LocationSerializer
+from .serializers import UserSerializer,ProductSerializer,ResetPasswordRequestSerializer,\
+    ResetPasswordSerializer,LocationSerializer,UserProductId
 from .models import User,Product,PasswordReset,UserLocation
 import jwt, datetime
 from rest_framework.permissions import IsAuthenticated
@@ -285,15 +286,24 @@ class MidpointView(APIView):
     def post(self, request, format=None):
         # Get the currently logged-in user's location
         try:
-            user_location = UserLocation.objects.get(user_id=request.user)
+            user_location = UserLocation.objects.get(user=request.user)
         except UserLocation.DoesNotExist:
             return Response({"error": "User location not found."}, status=status.HTTP_404_NOT_FOUND)
 
         # Validate and extract location from the POST request
-        serializer = LocationSerializer(data=request.data)
+        serializer = UserProductId(data=request.data)
+        print("Request Data:", request.data)
         if serializer.is_valid():
-            provided_lat = serializer.validated_data['latitude']
-            provided_lon = serializer.validated_data['longitude']
+            print("Errors",serializer.errors)
+            user_id = serializer.validated_data.get('id')
+            print("User id",user_id)
+            user_email = UserLocation.objects.get(user_id=user_id)
+            print("Product location",user_email.latitude)
+            print("Product location",user_email.longitude)
+            
+            # Extract user's latitude and longitude via frontend request
+            provided_lat = user_email.latitude
+            provided_lon = user_email.longitude
 
             # Extract user's latitude and longitude
             user_lat = user_location.latitude
