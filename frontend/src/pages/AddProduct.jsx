@@ -4,13 +4,12 @@ import { Step, Stepper } from "react-form-stepper";
 import FIrstStep from "../component/FIrstStep";
 import SecondStep from "../component/SecondStep";
 import ThirdStep from "../component/ThirdStep";
-import { json } from "react-router-dom";
 
 const AddProduct = () => {
   const [activeStep, setActiveStep] = useState(1);
 
   const [formdata, setFormData] = useState({
-    name: undefined,
+    title: undefined,
     price: undefined,
     description: undefined,
     condition: undefined,
@@ -18,25 +17,17 @@ const AddProduct = () => {
     usedFor: undefined,
     location: undefined,
     locationDescription: undefined,
-    // sold: false,
-    countInStock: 3,
   });
 
   const handleSubmit = async () => {
     console.log("clicking");
-    const requestBody = new URLSearchParams();
-    Object.keys(formdata).forEach((each) =>
-      requestBody.append(each, formdata[each])
-    );
-    // const requestBody = JSON.stringify(formdata);
     try {
-      // console.log(formBody);
       await fetch("http://127.0.0.1:8000/centroApp/Product/", {
         method: "POST",
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/json",
         },
-        body: requestBody,
+        body: JSON.stringify(formdata),
       });
     } catch (err) {
       console.log(err);

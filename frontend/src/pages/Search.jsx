@@ -33,7 +33,7 @@ const SearchResults = () => {
 
   return (
     <CenterComponent>
-      <div className='w-fit search-results'>
+      <div className='search-results'>
         <h1>Search Results for "{query}"</h1>
         {loading && <p>Loading...</p>}
 
