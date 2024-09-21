@@ -310,7 +310,7 @@ class MidpointView(APIView):
             user_lat = user_location.latitude
             user_lon = user_location.longitude
 
-            # Calculate the midpoint
+            # Calculate the midpoint from two users locations
             midpoint = find_midpoint(user_lat, user_lon, provided_lat, provided_lon)
 
             # return Response({
