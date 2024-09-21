@@ -5,7 +5,7 @@ from .models import User,Product,UserLocation
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'firstname', 'lastname', 'email', 'password']
+        fields = ['id', 'firstname','lastname', 'email', 'password']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -13,24 +13,15 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop('password', None)
         instance = self.Meta.model(**validated_data)
-        if password:
+        if password is not None:
             instance.set_password(password)
         instance.save()
         return instance
 
 class ProductSerializer(serializers.ModelSerializer):
-
-    user_firstname = serializers.SerializerMethodField()
-    user_lastname = serializers.SerializerMethodField()
     class Meta:
         model = Product
         fields = '__all__'
-
-    def get_user_firstname(self, obj):
-        return obj.userName.firstname if obj.userName else None
-
-    def get_user_lastname(self, obj):
-        return obj.userName.lastname if obj.userName else None
 
 class ResetPasswordRequestSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
@@ -46,10 +37,8 @@ class ResetPasswordSerializer(serializers.Serializer):
     
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
-        # model = UserLocation
-        # fields = ['latitude', 'longitude']
-        model = Product
-        fields = ['id']
+        model = UserLocation
+        fields = ['latitude', 'longitude']
     
     def create(self, validated_data):
         return UserLocation.objects.create(**validated_data)
