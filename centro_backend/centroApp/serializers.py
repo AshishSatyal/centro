@@ -53,6 +53,7 @@ class LocationSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         return UserLocation.objects.create(**validated_data)
-    
+
+#get user id
 class UserProductIdSerializer(serializers.Serializer):
     id = serializers.IntegerField()
