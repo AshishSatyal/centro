@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User,Product,UserLocation
+from .models import User,Product,UserLocation,Comment
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -56,3 +56,12 @@ class LocationSerializer(serializers.ModelSerializer):
     
 class UserProductIdSerializer(serializers.Serializer):
     id = serializers.IntegerField()
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'product', 'user', 'comment_text', 'created_at']
+        read_only_fields = ['id', 'created_at', 'user']
+
+    def create(self, validated_data):
+        return Comment.objects.create(**validated_data)  # Use only validated_data

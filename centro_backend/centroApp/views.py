@@ -1,13 +1,16 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import UserSerializer,ProductSerializer,ResetPasswordRequestSerializer,\
+from .serializers import CommentSerializer, UserSerializer,ProductSerializer,\
+    ResetPasswordRequestSerializer,\
     ResetPasswordSerializer,LocationSerializer,UserProductIdSerializer
-from .models import User,Product,PasswordReset,UserLocation
+
+from .models import User,Product,PasswordReset,UserLocation,Comment
 import jwt, datetime
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework import generics, permissions
 
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from rest_framework import generics,status
@@ -325,3 +328,18 @@ class MidpointView(APIView):
             })
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class CommentListCreateView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        product_id = self.kwargs['product_id']
+        return Comment.objects.filter(product__id=product_id)
+
+    def perform_create(self, serializer):
+        product_id = self.kwargs['product_id']
+        product = Product.objects.get(id=product_id)  # Get the product instance
+        serializer.save(user=self.request.user, product=product)  # Pass both user and product
+

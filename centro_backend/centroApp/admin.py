@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
-from .models import User,Product,PasswordReset,UserLocation
+from .models import User,Product,PasswordReset,UserLocation,Comment
 
 class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
@@ -31,4 +31,5 @@ admin.site.unregister(Group)
 admin.site.register(Product)
 
 admin.site.register(UserLocation)
+admin.site.register(Comment)
 # admin.site.register(PasswordReset)
