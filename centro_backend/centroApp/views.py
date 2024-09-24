@@ -478,15 +478,29 @@ class PurchasePremiumMembershipView(APIView):
             return Response({'error': 'Payment initiation failed'}, status=response.status_code)
         
 class PremiumMembershipSuccessView(APIView):
-    def get(self, request):
+    def get(self, request,pidx,status):
         user = request.user
-        pidx = request.GET.get('pidx')
-        payment_status = request.GET.get('status')
         
-        # Validate the payment here (similar to your current success logic)
-        # Check the payment status and update the membership status
+        url = "https://a.khalti.com/api/v2/epayment/lookup/"
+    
+        headers = {
+            'Authorization': 'key 07b52c0f30dc425ea9c53fd77e798e9d',
+            'Content-Type': 'application/json',
+        }
+        
+        payload = json.dumps({
+            "pidx": pidx
+        })
+        
+        response = requests.request("POST", url, headers=headers, data=payload)
+
+        print(response.text)
+        
+        new_res = json.loads(response.text)
+        print(new_res)
+
         membership = PremiumMembership.objects.get(user=user)
-        if payment_status == "Completed" and membership.payment_id == pidx:
+        if status == "Completed" and membership.payment_id == pidx:
             membership.is_purchased = True
             membership.save()
 

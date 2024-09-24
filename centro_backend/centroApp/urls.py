@@ -30,8 +30,7 @@ urlpatterns = [
     path('saved-items/', SavedItemView.as_view(), name='saved-items-list'),
 
     path('premium/membership/purchase/', PurchasePremiumMembershipView.as_view(), name='purchase_premium_membership'),
-    path('premium/membership/success/', PremiumMembershipSuccessView.as_view(), name='premium_membership_success'),
-
+path('premium/membership/success/<str:pidx>/<str:status>/', PremiumMembershipSuccessView.as_view(), name='membership_success'),
     
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
