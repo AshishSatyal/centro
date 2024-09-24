@@ -4,6 +4,7 @@ import CenterComponent from "../component/CenterComponent";
 import { useParams } from "react-router-dom";
 import ProductItem from "../component/ProductItem";
 import Comment from "../component/Comment";
+import Similar from "../component/Similar";
 
 const ProductPage = () => {
   const [product, setProduct] = useState([]);
@@ -59,8 +60,9 @@ const ProductPage = () => {
       <Comment />
       <div className='w-fit'>
         <p className='border-b text-lg capitalize'>Similar Products</p>
-        <ProductItem key={product.id} product={product} />
+        {/* <ProductItem key={product.id} product={product} /> */}
       </div>
+      <Similar />
     </div>
   );
 };
