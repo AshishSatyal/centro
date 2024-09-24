@@ -3,6 +3,7 @@ import CenterComponent from "../component/CenterComponent";
 
 import { useParams } from "react-router-dom";
 import ProductItem from "../component/ProductItem";
+import Comment from "../component/Comment";
 
 const ProductPage = () => {
   const [product, setProduct] = useState([]);
@@ -55,6 +56,7 @@ const ProductPage = () => {
   return (
     <div className='flex-col mt-2'>
       <div>{productEl}</div>
+      <Comment />
       <div className='w-fit'>
         <p className='border-b text-lg capitalize'>Similar Products</p>
         <ProductItem key={product.id} product={product} />
