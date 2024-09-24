@@ -1,6 +1,7 @@
 // src/components/ProductItem.js
 import React from "react";
 import { Link } from "react-router-dom";
+import Comment from "./Comment";
 
 const ProductItem = ({ product }) => {
   return (
@@ -28,6 +29,7 @@ const ProductItem = ({ product }) => {
           </div>
         </div>
       </div>
+      <Comment />
     </Link>
   );
 };
