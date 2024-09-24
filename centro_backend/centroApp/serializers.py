@@ -57,14 +57,26 @@ class LocationSerializer(serializers.ModelSerializer):
 class UserProductIdSerializer(serializers.Serializer):
     id = serializers.IntegerField()
 
+# class CommentSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Comment
+#         fields = ['id', 'product', 'user', 'comment_text', 'created_at']
+#         read_only_fields = ['id', 'created_at', 'user']
+
+#     def create(self, validated_data):
+#         return Comment.objects.create(**validated_data)  # Use only validated_data
+
 class CommentSerializer(serializers.ModelSerializer):
+    user_full_name = serializers.SerializerMethodField()
+
     class Meta:
         model = Comment
-        fields = ['id', 'product', 'user', 'comment_text', 'created_at']
-        read_only_fields = ['id', 'created_at', 'user']
+        fields = ['id', 'product', 'user_full_name', 'comment_text', 'created_at']
+        read_only_fields = ['id', 'created_at', 'user_full_name']
 
-    def create(self, validated_data):
-        return Comment.objects.create(**validated_data)  # Use only validated_data
+    def get_user_full_name(self, obj):
+        return obj.user.get_full_name()
+
 
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
