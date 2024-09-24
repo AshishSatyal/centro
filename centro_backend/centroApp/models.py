@@ -44,6 +44,9 @@ class User(AbstractUser):
 
     objects = UserManager()
 
+    def get_full_name(self):
+        return f"{self.firstname} {self.lastname}"
+
 class Product(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
