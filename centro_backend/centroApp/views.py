@@ -1,11 +1,12 @@
+import uuid
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import CommentSerializer, UserSerializer,ProductSerializer,\
+from .serializers import CommentSerializer, SavedItemSerializer, TransactionSerializer, UserSerializer,ProductSerializer,\
     ResetPasswordRequestSerializer,\
     ResetPasswordSerializer,LocationSerializer,UserProductIdSerializer
 
-from .models import User,Product,PasswordReset,UserLocation,Comment
+from .models import PremiumMembership, SavedItem, Transaction, User,Product,PasswordReset,UserLocation,Comment
 import jwt, datetime
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -26,6 +27,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
 import math
+
+import requests
+import json
+from datetime import datetime, timedelta
+
 
 # Create your views here.
 class RegisterView(APIView):
@@ -116,32 +122,50 @@ class ProductView(APIView):
     
 #Delete,Update and view individual product
 class IndividualProductView(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     def get(self,request,pk):
         product = Product.objects.get(id=pk)
         serializer = ProductSerializer(product)
         return Response(serializer.data)
     
-    def delete(self,request,pk):
-        product = Product.objects.get(id=pk)
-        product.delete()
-        return Response('Product deleted successfully')
-    
-    def put(self,request,pk):
-        product = Product.objects.get(id=pk)
-        serializer = ProductSerializer(instance=product,data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+    def delete(self, request, pk):
+        try:
+            product = Product.objects.get(id=pk)
+
+            # Check if the requesting user is the seller of the product
+            if product.userName != request.user:
+                return Response({"error": "You do not have permission to delete this product."}, status=status.HTTP_403_FORBIDDEN)
+
+            # Delete the product
+            product.delete()
+            return Response({'message': 'Product deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    def patch(self, request, pk):
+        try:
+            product = Product.objects.get(id=pk)
+
+            # Check if the requesting user is the seller of the product
+            if product.userName != request.user:
+                return Response({"error": "You do not have permission to update this product."}, status=status.HTTP_403_FORBIDDEN)
+
+            serializer = ProductSerializer(instance=product, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 #Search Products
 class SearchProductView(APIView):
      permission_classes = (IsAuthenticated,)
-def get(self, request):
-       product_name = request.query_params.get('name', '')  # Retrieve the 'name' parameter from the query string
-       products = Product.objects.filter(name__icontains=product_name)  # Use 'icontains' for case-insensitive matching
-       serializer = ProductSerializer(products, many=True)
-       return Response(serializer.data)
+
+     def get(self, request):
+        product_name = request.query_params.get('name', '')  # Retrieve the 'name' parameter from the query string
+        products = Product.objects.filter(name__icontains=product_name)  # Use 'icontains' for case-insensitive matching
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
 
 
 class RequestPasswordReset(generics.GenericAPIView):
@@ -343,3 +367,143 @@ class CommentListCreateView(generics.ListCreateAPIView):
         product = Product.objects.get(id=product_id)  # Get the product instance
         serializer.save(user=self.request.user, product=product)  # Pass both user and product
 
+
+class PurchaseView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, product_id):
+        product = Product.objects.get(id=product_id)
+        quantity = int(request.data.get('quantity'))
+        
+        try:
+            product.reduce_stock(quantity)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        total_price = product.price * quantity
+        transaction = Transaction.objects.create(
+            user=request.user,
+            product=product,
+            quantity=quantity,
+            total_price=total_price
+        )
+
+        return Response({'message': 'Purchase successful', 'transaction_id': transaction.id}, status=status.HTTP_201_CREATED)
+
+class TransactionHistoryView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TransactionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Transaction.objects.filter(user=self.request.user)
+    
+class SavedItemView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Get the list of saved items for the logged-in user
+        saved_items = SavedItem.objects.filter(user=request.user)
+        serializer = SavedItemSerializer(saved_items, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, product_id):
+        # Check if the product exists
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Check if the product is already saved
+        if SavedItem.objects.filter(user=request.user, product=product).exists():
+            return Response({"message": "Product already in saved items"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Save the product to saved items
+        saved_item = SavedItem.objects.create(user=request.user, product=product)
+        serializer = SavedItemSerializer(saved_item)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class PurchasePremiumMembershipView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        subPaisa = 10000  # example amount in paisa (100.00 for the purchase)
+        pxid = str(uuid.uuid4())
+        return_url = "premium/membership/success/"
+        # Khalti payment initiation logic
+        url = "https://a.khalti.com/api/v2/epayment/initiate/"
+
+        payload = json.dumps({
+            "return_url": "http://127.0.0.1:8000/"+return_url,
+            "website_url": "http://127.0.0.0:8000",
+            "amount": "1000",
+            "purchase_order_id": pxid,
+            "purchase_order_name": "Membership",
+            "customer_info": {
+            "name": user.firstname,
+            "email": user.email,
+            "phone": "9800000001"
+            }
+        })
+        headers = {
+            'Authorization': 'key 07b52c0f30dc425ea9c53fd77e798e9d',
+            'Content-Type': 'application/json',
+}
+        response = requests.post(url, headers=headers, data=payload)
+        new_res = json.loads(response.text)
+
+        if response.status_code == 200:
+            # Create or update the premium membership
+            membership, created = PremiumMembership.objects.get_or_create(user=user)
+
+            # Set the expiration date for the membership if it was created
+            if created:
+                print("Membership created")
+                membership.expiration_date = datetime.now() + timedelta(days=30)  # Membership valid for 30 days
+                membership.payment_id = new_res['pidx']  # Save the payment ID if needed
+                membership.is_purchased = True
+            else:
+                print("Membership already exists")
+                # Optionally update the expiration date if you want to renew
+                membership.payment_id = new_res['pidx']
+                membership.expiration_date = datetime.now() + timedelta(days=30)  # Renew for another 30 days
+            print("Payment URL:", new_res['payment_url'])
+            membership.save()
+
+            
+            return Response({'payment_url': new_res['payment_url']}, status=200)
+        else:
+            return Response({'error': 'Payment initiation failed'}, status=response.status_code)
+        
+class PremiumMembershipSuccessView(APIView):
+    def get(self, request,pidx,status):
+        user = request.user
+        
+        url = "https://a.khalti.com/api/v2/epayment/lookup/"
+    
+        headers = {
+            'Authorization': 'key 07b52c0f30dc425ea9c53fd77e798e9d',
+            'Content-Type': 'application/json',
+        }
+        
+        payload = json.dumps({
+            "pidx": pidx
+        })
+        
+        response = requests.request("POST", url, headers=headers, data=payload)
+
+        print(response.text)
+        
+        new_res = json.loads(response.text)
+        print(new_res)
+
+        membership = PremiumMembership.objects.get(user=user)
+        if status == "Completed" and membership.payment_id == pidx:
+            membership.is_purchased = True
+            membership.save()
+
+            return Response({'status': 'Payment successful. Membership activated!'}, status=200)
+        else:
+            return Response({'error': 'Payment not completed.'}, status=400)

@@ -5,6 +5,9 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import BaseUserManager, AbstractUser
 from django.db import models
 
+from datetime import datetime, timedelta, timezone
+
+
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -52,6 +55,12 @@ class Product(models.Model):
     userName = models.ForeignKey(User, on_delete=models.CASCADE)
     location = models.CharField(max_length=255)
 
+    def reduce_stock(self, quantity):
+        if quantity > self.countInStock:
+            raise ValueError("Not enough stock available")
+        self.countInStock -= quantity
+        self.save()
+
     def __str__(self):
         return self.name
     
@@ -76,3 +85,34 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user.email} on {self.product.name}"
+
+class Transaction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    total_price = models.FloatField()
+    transaction_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.email} purchased {self.quantity} of {self.product.name}"
+    
+class SavedItem(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    saved_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'product')  # Ensures the user can't save the same product multiple times
+
+    def __str__(self):
+        return f"{self.user.email} saved {self.product.name}"
+    
+class PremiumMembership(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    purchase_date = models.DateTimeField(auto_now_add=True)
+    expiration_date = models.DateTimeField(null=True, blank=True)
+    is_purchased = models.BooleanField(default=False)
+    payment_id = models.CharField(max_length=255)
+
+    def is_active(self):
+        return timezone.now() < self.expiration_date
