@@ -1,3 +1,4 @@
+import uuid
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
@@ -5,7 +6,7 @@ from .serializers import CommentSerializer, SavedItemSerializer, TransactionSeri
     ResetPasswordRequestSerializer,\
     ResetPasswordSerializer,LocationSerializer,UserProductIdSerializer
 
-from .models import SavedItem, Transaction, User,Product,PasswordReset,UserLocation,Comment
+from .models import PremiumMembership, SavedItem, Transaction, User,Product,PasswordReset,UserLocation,Comment
 import jwt, datetime
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -26,6 +27,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
 import math
+
+import requests
+import json
+from datetime import datetime, timedelta
+
 
 # Create your views here.
 class RegisterView(APIView):
@@ -122,17 +128,34 @@ class IndividualProductView(APIView):
         serializer = ProductSerializer(product)
         return Response(serializer.data)
     
-    def delete(self,request,pk):
-        product = Product.objects.get(id=pk)
-        product.delete()
-        return Response('Product deleted successfully')
-    
-    def put(self,request,pk):
-        product = Product.objects.get(id=pk)
-        serializer = ProductSerializer(instance=product,data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+    def delete(self, request, pk):
+        try:
+            product = Product.objects.get(id=pk)
+
+            # Check if the requesting user is the seller of the product
+            if product.userName != request.user:
+                return Response({"error": "You do not have permission to delete this product."}, status=status.HTTP_403_FORBIDDEN)
+
+            # Delete the product
+            product.delete()
+            return Response({'message': 'Product deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    def patch(self, request, pk):
+        try:
+            product = Product.objects.get(id=pk)
+
+            # Check if the requesting user is the seller of the product
+            if product.userName != request.user:
+                return Response({"error": "You do not have permission to update this product."}, status=status.HTTP_403_FORBIDDEN)
+
+            serializer = ProductSerializer(instance=product, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 #Search Products
 class SearchProductView(APIView):
@@ -401,3 +424,72 @@ class SavedItemView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+class PurchasePremiumMembershipView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        subPaisa = 10000  # example amount in paisa (100.00 for the purchase)
+        pxid = str(uuid.uuid4())
+        return_url = "premium/membership/success/"
+        # Khalti payment initiation logic
+        url = "https://a.khalti.com/api/v2/epayment/initiate/"
+
+        payload = json.dumps({
+            "return_url": "http://127.0.0.1:8000/"+return_url,
+            "website_url": "http://127.0.0.0:8000",
+            "amount": "1000",
+            "purchase_order_id": pxid,
+            "purchase_order_name": "Membership",
+            "customer_info": {
+            "name": user.firstname,
+            "email": user.email,
+            "phone": "9800000001"
+            }
+        })
+        headers = {
+            'Authorization': 'key 07b52c0f30dc425ea9c53fd77e798e9d',
+            'Content-Type': 'application/json',
+}
+        response = requests.post(url, headers=headers, data=payload)
+        new_res = json.loads(response.text)
+
+        if response.status_code == 200:
+            # Create or update the premium membership
+            membership, created = PremiumMembership.objects.get_or_create(user=user)
+
+            # Set the expiration date for the membership if it was created
+            if created:
+                print("Membership created")
+                membership.expiration_date = datetime.now() + timedelta(days=30)  # Membership valid for 30 days
+                membership.payment_id = new_res['pidx']  # Save the payment ID if needed
+                membership.is_purchased = True
+            else:
+                print("Membership already exists")
+                # Optionally update the expiration date if you want to renew
+                membership.payment_id = new_res['pidx']
+                membership.expiration_date = datetime.now() + timedelta(days=30)  # Renew for another 30 days
+            print("Payment URL:", new_res['payment_url'])
+            membership.save()
+
+            
+            return Response({'payment_url': new_res['payment_url']}, status=200)
+        else:
+            return Response({'error': 'Payment initiation failed'}, status=response.status_code)
+        
+class PremiumMembershipSuccessView(APIView):
+    def get(self, request):
+        user = request.user
+        pidx = request.GET.get('pidx')
+        payment_status = request.GET.get('status')
+        
+        # Validate the payment here (similar to your current success logic)
+        # Check the payment status and update the membership status
+        membership = PremiumMembership.objects.get(user=user)
+        if payment_status == "Completed" and membership.payment_id == pidx:
+            membership.is_purchased = True
+            membership.save()
+
+            return Response({'status': 'Payment successful. Membership activated!'}, status=200)
+        else:
+            return Response({'error': 'Payment not completed.'}, status=400)

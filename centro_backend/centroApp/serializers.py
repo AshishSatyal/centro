@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SavedItem, Transaction, User,Product,UserLocation,Comment
+from .models import PremiumMembership, SavedItem, Transaction, User,Product,UserLocation,Comment
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -78,3 +78,8 @@ class SavedItemSerializer(serializers.ModelSerializer):
         model = SavedItem
         fields = ['id', 'user', 'product', 'product_name', 'saved_at']
         read_only_fields = ['user', 'saved_at']
+
+class PremiumMembershipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PremiumMembership
+        fields = ['user', 'purchase_date', 'expiration_date']

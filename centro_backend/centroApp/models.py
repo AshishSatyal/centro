@@ -5,6 +5,9 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import BaseUserManager, AbstractUser
 from django.db import models
 
+from datetime import datetime, timedelta, timezone
+
+
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -103,3 +106,13 @@ class SavedItem(models.Model):
 
     def __str__(self):
         return f"{self.user.email} saved {self.product.name}"
+    
+class PremiumMembership(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    purchase_date = models.DateTimeField(auto_now_add=True)
+    expiration_date = models.DateTimeField(null=True, blank=True)
+    is_purchased = models.BooleanField(default=False)
+    payment_id = models.CharField(max_length=255)
+
+    def is_active(self):
+        return timezone.now() < self.expiration_date
