@@ -1,11 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import CommentSerializer, UserSerializer,ProductSerializer,\
+from .serializers import CommentSerializer, SavedItemSerializer, TransactionSerializer, UserSerializer,ProductSerializer,\
     ResetPasswordRequestSerializer,\
     ResetPasswordSerializer,LocationSerializer,UserProductIdSerializer
 
-from .models import User,Product,PasswordReset,UserLocation,Comment
+from .models import SavedItem, Transaction, User,Product,PasswordReset,UserLocation,Comment
 import jwt, datetime
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -116,7 +116,7 @@ class ProductView(APIView):
     
 #Delete,Update and view individual product
 class IndividualProductView(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     def get(self,request,pk):
         product = Product.objects.get(id=pk)
         serializer = ProductSerializer(product)
@@ -137,11 +137,12 @@ class IndividualProductView(APIView):
 #Search Products
 class SearchProductView(APIView):
      permission_classes = (IsAuthenticated,)
-def get(self, request):
-       product_name = request.query_params.get('name', '')  # Retrieve the 'name' parameter from the query string
-       products = Product.objects.filter(name__icontains=product_name)  # Use 'icontains' for case-insensitive matching
-       serializer = ProductSerializer(products, many=True)
-       return Response(serializer.data)
+
+     def get(self, request):
+        product_name = request.query_params.get('name', '')  # Retrieve the 'name' parameter from the query string
+        products = Product.objects.filter(name__icontains=product_name)  # Use 'icontains' for case-insensitive matching
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
 
 
 class RequestPasswordReset(generics.GenericAPIView):
@@ -342,4 +343,61 @@ class CommentListCreateView(generics.ListCreateAPIView):
         product_id = self.kwargs['product_id']
         product = Product.objects.get(id=product_id)  # Get the product instance
         serializer.save(user=self.request.user, product=product)  # Pass both user and product
+
+
+class PurchaseView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, product_id):
+        product = Product.objects.get(id=product_id)
+        quantity = int(request.data.get('quantity'))
+        
+        try:
+            product.reduce_stock(quantity)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        total_price = product.price * quantity
+        transaction = Transaction.objects.create(
+            user=request.user,
+            product=product,
+            quantity=quantity,
+            total_price=total_price
+        )
+
+        return Response({'message': 'Purchase successful', 'transaction_id': transaction.id}, status=status.HTTP_201_CREATED)
+
+class TransactionHistoryView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TransactionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Transaction.objects.filter(user=self.request.user)
+    
+class SavedItemView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Get the list of saved items for the logged-in user
+        saved_items = SavedItem.objects.filter(user=request.user)
+        serializer = SavedItemSerializer(saved_items, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, product_id):
+        # Check if the product exists
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Check if the product is already saved
+        if SavedItem.objects.filter(user=request.user, product=product).exists():
+            return Response({"message": "Product already in saved items"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Save the product to saved items
+        saved_item = SavedItem.objects.create(user=request.user, product=product)
+        serializer = SavedItemSerializer(saved_item)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 

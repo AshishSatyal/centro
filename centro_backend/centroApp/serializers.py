@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User,Product,UserLocation,Comment
+from .models import SavedItem, Transaction, User,Product,UserLocation,Comment
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -65,3 +65,16 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Comment.objects.create(**validated_data)  # Use only validated_data
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = ['product', 'quantity', 'total_price', 'transaction_date']
+
+class SavedItemSerializer(serializers.ModelSerializer):
+    product_name = serializers.ReadOnlyField(source='product.name')
+
+    class Meta:
+        model = SavedItem
+        fields = ['id', 'user', 'product', 'product_name', 'saved_at']
+        read_only_fields = ['user', 'saved_at']
