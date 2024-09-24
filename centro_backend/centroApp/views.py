@@ -250,33 +250,46 @@ def text_to_vector(texts):
 
 class SimilarityAPIView(APIView):
 
-    def get(self, request, format=None):
-        products = Product.objects.all()
-        if products.count() < 2:
-            return Response({"message": "Not enough products to calculate similarity"}, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request, product_id, format=None):
+        try:
+            target_product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({"message": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        products = Product.objects.exclude(id=product_id)  # Exclude the target product itself
+        if products.count() < 1:
+            return Response({"message": "No other products to calculate similarity"}, status=status.HTTP_400_BAD_REQUEST)
 
         product_list = [f"{p.name} {p.description} {p.condition}" for p in products]
 
+        # Add the target product to the list for vector comparison
+        target_product_text = f"{target_product.name} {target_product.description} {target_product.condition}"
+        product_list.append(target_product_text)
+
+        # Convert product descriptions to vectors
         vectors = text_to_vector(product_list)
 
-        # Calculate cosine similarity matrix
-        similarity_matrix = cosine_similarity(vectors)
-        response_data = []
+        # Get the vector for the target product
+        target_vector = vectors[-1]  # The last one corresponds to the target product
 
+        # Calculate cosine similarity between the target product and all other products
+        similarity_scores = cosine_similarity(target_vector, vectors[:-1]).flatten()
+
+        # Prepare the response data
+        similar_products = []
         for i, product in enumerate(products):
-            similar_products = []
-            for j, other_product in enumerate(products):
-                if i != j:
-                    similar_products.append({
-                        "product_id": other_product.id,
-                        "similarity_score": similarity_matrix[i][j]
-                    })
-            similar_products = sorted(similar_products, key=lambda x: x["similarity_score"], reverse=True)[:5]
-            
-            response_data.append({
+            similar_products.append({
                 "product_id": product.id,
-                "similar_products": similar_products
+                "similarity_score": similarity_scores[i]
             })
+
+        # Sort by similarity score in descending order and take top 5
+        similar_products = sorted(similar_products, key=lambda x: x["similarity_score"], reverse=True)[:5]
+
+        response_data = {
+            "product_id": target_product.id,
+            "similar_products": similar_products
+        }
 
         return Response(response_data, status=status.HTTP_200_OK)
     

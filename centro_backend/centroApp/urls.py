@@ -21,7 +21,7 @@ urlpatterns = [
     path('searchProduct/', SearchProductView.as_view()),
     path('requestReset/', RequestPasswordReset.as_view()),
     path('resetPassword/', ResetPassword.as_view()),
-    path('similarity/', SimilarityAPIView.as_view()),
+    path('similarity/<int:product_id>/', SimilarityAPIView.as_view(), name='product_similarity'),
     path('midpointView/', MidpointView.as_view()),
     path('products/<int:product_id>/comments/', CommentListCreateView.as_view()),
     path('products/<int:product_id>/purchase/', PurchaseView.as_view()),
