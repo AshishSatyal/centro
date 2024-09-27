@@ -31,6 +31,7 @@ import math
 import requests
 import json
 from datetime import datetime, timedelta
+from django.utils import timezone
 
 
 # Create your views here.
@@ -442,7 +443,6 @@ class SavedItemView(APIView):
         serializer = SavedItemSerializer(saved_item)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-
 class PurchasePremiumMembershipView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -526,3 +526,20 @@ class PremiumMembershipSuccessView(APIView):
             return Response({'status': 'Payment successful. Membership activated!'}, status=200)
         else:
             return Response({'error': 'Payment not completed.'}, status=400)
+
+class TrendingProductView(APIView):
+    def get(self, request):
+        # Find users with active premium membership
+        active_premium_users = PremiumMembership.objects.filter(
+            is_purchased=True,
+            expiration_date__gt=timezone.now()
+        ).values_list('user', flat=True)
+
+        # Filter products added by users with an active premium membership
+        trending_products = Product.objects.filter(
+            userName__in=active_premium_users
+        ).order_by('-id')[:10]
+
+        # Serialize the trending products
+        serializer = ProductSerializer(trending_products, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

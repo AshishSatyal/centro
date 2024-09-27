@@ -119,3 +119,7 @@ class PremiumMembership(models.Model):
 
     def is_active(self):
         return timezone.now() < self.expiration_date
+    
+    def __str__(self):
+        return f"Premium Member: {self.user.email}"
+    
