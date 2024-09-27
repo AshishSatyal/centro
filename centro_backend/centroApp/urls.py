@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PremiumMembershipSuccessView, PurchasePremiumMembershipView, PurchaseView, RegisterView, LoginView, SavedItemView, TransactionHistoryView, UserView,\
+from .views import PremiumMembershipSuccessView, PurchasePremiumMembershipView, PurchaseView, RegisterView, LoginView, SavedItemView, TransactionHistoryView, TrendingProductView, UserView,\
       LogoutView,ProductView,IndividualProductView,SearchProductView,\
         RequestPasswordReset,ResetPassword,SimilarityAPIView,MidpointView\
         ,CommentListCreateView
@@ -28,6 +28,7 @@ urlpatterns = [
     path('transactions/history/', TransactionHistoryView.as_view()),
     path('products/<int:product_id>/save/', SavedItemView.as_view()),
     path('saved-items/', SavedItemView.as_view(), name='saved-items-list'),
+    path('trendingProducts/', TrendingProductView.as_view()),
 
     path('premium/membership/purchase/', PurchasePremiumMembershipView.as_view(), name='purchase_premium_membership'),
     path('premium/membership/success/<str:pidx>/<str:status>/', PremiumMembershipSuccessView.as_view(), name='membership_success'),
