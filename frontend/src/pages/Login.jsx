@@ -2,8 +2,10 @@ import React from "react";
 import CenterComponent from "../component/CenterComponent";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
+  const { setTokens } = useAuth();
   const navigate = useNavigate();
   const {
     register,
@@ -26,6 +28,10 @@ const Login = () => {
         }
       );
       if (response.ok) {
+        const result = await response.json();
+        const { access, refresh } = result;
+
+        setTokens({ access, refresh });
         navigate("/");
       }
     } catch (err) {
@@ -34,6 +40,7 @@ const Login = () => {
       });
     }
   };
+
   return (
     <CenterComponent>
       <div className='flex flex-col justify-center items-center w-full h-[100vh]'>

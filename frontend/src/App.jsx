@@ -13,6 +13,7 @@ function App() {
       <div className='bottom-1 fixed md:hidden w-full'>
         <NavSmall />
       </div>
+
       <div className='flex justify-around'>
         <Product />
         <Trending />

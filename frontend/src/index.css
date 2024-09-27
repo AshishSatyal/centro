@@ -64,7 +64,7 @@ select {
   @apply border-white text-white bg-black;
 }
 .premium-txt {
-  background: -webkit-linear-gradient(rgb(134, 129, 167), rgb(9, 54, 117));
+  background: -webkit-linear-gradient(rgb(230, 224, 223), rgb(27, 26, 26));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

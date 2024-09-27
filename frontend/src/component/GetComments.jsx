@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import useAxios from "../util/axios";
 
 const GetComments = ({ id }) => {
   const [comments, setComments] = useState([]);
+  const axiosInstance = useAxios();
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8000/centroApp/products/${id}/comments/`
+        const response = await axiosInstance.get(
+          `/centroApp/products/${id}/comments/`
         );
-        const data = await response.json();
-        setComments(data); // Update state with fetched comments
+
+        setComments(response.data); // Update state with fetched comments
       } catch (error) {
         console.error("Error fetching comments:", error);
       }
