@@ -4,7 +4,6 @@ import ProductItem from "../component/ProductItem";
 
 const Product = () => {
   const [products, setProducts] = useState([]);
-  console.log(products);
 
   useEffect(() => {
     const fetchProducts = async () => {

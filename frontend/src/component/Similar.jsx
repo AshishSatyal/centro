@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from "react";
 import ProductItem from "./ProductItem";
-
+import { useAuth } from "../context/AuthContext";
+import useAxios from "../util/axios";
 const Similar = () => {
+  const axiosInstance = useAxios();
   const [similarProduct, setSimilarProduct] = useState([]);
 
   useEffect(() => {
     const getSimilarProduct = async () => {
       try {
-        const response = await fetch(
-          "http://127.0.0.1:8000/centroApp/similarity/"
-        );
+        const response = await axiosInstance.get("/centroApp/similarity/");
 
-        const data = response.json();
-
-        setSimilarProduct(data);
+        setSimilarProduct(response.data);
       } catch (err) {
         console.log(err);
       }

@@ -1,24 +1,28 @@
 import React, { useEffect, useState } from "react";
 import CenterComponent from "../component/CenterComponent";
-
+import { useAuth } from "../context/AuthContext";
+import useAxios from "../util/axios";
 import { useParams } from "react-router-dom";
 import ProductItem from "../component/ProductItem";
 import Comment from "../component/Comment";
 import Similar from "../component/Similar";
+import SaveProduct from "../component/SaveProduct";
 
 const ProductPage = () => {
+  const axiosInstance = useAxios();
   const [product, setProduct] = useState([]);
   const [similarProducut, setSimilarProduct] = useState([]);
 
   const { id } = useParams();
 
+  const { authTokens } = useAuth();
   useEffect(() => {
     const fetched = async () => {
-      const response = await fetch(
-        `http://127.0.0.1:8000/centroApp/selectedProduct/${id}`
+      const response = await axiosInstance.get(
+        `/centroApp/selectedProduct/${id}`
       );
-      const data = await response.json();
-      setProduct(data);
+      // const data = await response.json();
+      setProduct(response.data);
     };
     fetched();
   }, []);
@@ -34,7 +38,10 @@ const ProductPage = () => {
           />
         </div>
         <div className='p-2 w-[50%]'>
-          <p className='border-b text-3xl capitalize'>{product.name}</p>
+          <div className='flex justify-between'>
+            <p className='border-b text-3xl capitalize'>{product.name}</p>
+            <SaveProduct id={product.id} />
+          </div>
           <p className='my-4 text-xl'>{product.description}</p>
           <p className='my-4 border-b'>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Itaque,
@@ -60,7 +67,6 @@ const ProductPage = () => {
       <Comment />
       <div className='w-fit'>
         <p className='border-b text-lg capitalize'>Similar Products</p>
-        {/* <ProductItem key={product.id} product={product} /> */}
       </div>
       <Similar />
     </div>

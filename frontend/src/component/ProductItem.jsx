@@ -6,7 +6,7 @@ import Comment from "./Comment";
 const ProductItem = ({ product }) => {
   return (
     <Link to={`product/${product.id}`}>
-      <div className='hover:shadow border rounded-lg w-[30rem] h-40 transition-all'>
+      <div className='relative hover:shadow border rounded-lg w-[30rem] h-40 transition-all'>
         <div className='flex w-full h-full'>
           <div className='p-2 w-[30%] h-full'>
             <img
@@ -15,6 +15,7 @@ const ProductItem = ({ product }) => {
               alt='product'
             />
           </div>
+
           <div className='flex flex-col w-[70%]'>
             <p className='text-xl'>{product.name}</p>
             <p className='text-gray-600 text-sm'>{product.description}</p>
@@ -29,7 +30,6 @@ const ProductItem = ({ product }) => {
           </div>
         </div>
       </div>
-      <Comment />
     </Link>
   );
 };

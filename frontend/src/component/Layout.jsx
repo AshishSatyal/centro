@@ -5,8 +5,10 @@ import Sidebar from "./Sidebar";
 
 const Layout = () => {
   return (
-    <div>
-      <Header />
+    <div className='flex flex-col gap-16'>
+      <div>
+        <Header />
+      </div>
       <div className='flex gap-2'>
         <div className='relative w-1/5'>
           <Sidebar />

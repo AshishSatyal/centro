@@ -1,16 +1,24 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import HeaderBelow from "./HeaderBelow";
 
 const Header = () => {
-  const [query, setQuery] = useState();
+  const { authTokens, logout } = useAuth();
+
+  const [query, setQuery] = useState("");
   const navigate = useNavigate();
 
   const handleSearch = (event) => {
     event.preventDefault();
-    if (query.trim()) {
+    if (query?.trim()) {
       navigate(`/search/${encodeURIComponent(query)}`); // Navigate to search results page
     }
+  };
+  const handleLogout = () => {
+    console.log("handles logout");
+    logout();
   };
   return (
     <div className='top-0 left-0 z-10 fixed bg-slate-100 px-4 py-2 w-full md:h-20'>
@@ -36,24 +44,30 @@ const Header = () => {
         </div>
         <div className='md:flex justify-center items-center md:gap-5 hidden'>
           <Link
-            to='/signup'
-            className='border-2 hover:shadow py-2 rounded-xl w-24 md:w-36 h-12 text-center text-sm md:text-xl transition-all'
-          >
-            Sign Up
-          </Link>
-          <Link
             to='/add-product'
-            className='border-2 hover:shadow py-2 rounded-xl w-24 md:w-36 h-12 text-center text-xl transition-all'
+            className='border-2 hover:border-gray-500 py-2 border-black rounded-xl w-24 md:w-36 h-12 text-black text-center text-xl transition-all'
           >
             Add product
           </Link>
-          <Link
-            to={"/"}
-            className='premium-txt py-3 font-regular text-center text-sm md:text-xl'
-          >
-            Go Premium
-          </Link>
+          {authTokens ? (
+            <button
+              onClick={handleLogout}
+              className='border-2 border-gray-400 py-2 hover:border-black rounded-xl w-24 md:w-36 h-12 text-center text-sm md:text-xl transition-all'
+            >
+              Logout
+            </button>
+          ) : (
+            <Link
+              to='/signup'
+              className='border-2 py-2 hover:border-black rounded-xl w-24 md:w-36 h-12 text-center text-sm md:text-xl transition-all'
+            >
+              Sign Up
+            </Link>
+          )}
         </div>
+      </div>
+      <div className='mt-2'>
+        <HeaderBelow />
       </div>
     </div>
   );
