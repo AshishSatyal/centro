@@ -538,7 +538,7 @@ class TrendingProductView(APIView):
         # Filter products added by users with an active premium membership
         trending_products = Product.objects.filter(
             userName__in=active_premium_users
-        ).order_by('-id')[:10]
+        ).order_by('?')[:10]
 
         # Serialize the trending products
         serializer = ProductSerializer(trending_products, many=True)
