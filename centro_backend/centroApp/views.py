@@ -278,10 +278,16 @@ class SimilarityAPIView(APIView):
         # Prepare the response data
         similar_products = []
         for i, product in enumerate(products):
-            similar_products.append({
+            product_data = {
                 "product_id": product.id,
+                "name": product.name,
+                "description": product.description,
+                "price": product.price,
+                "image": product.image.url if product.image else None,
+                "condition": product.condition,
                 "similarity_score": similarity_scores[i]
-            })
+            }
+            similar_products.append(product_data)
 
         # Sort by similarity score in descending order and take top 5
         similar_products = sorted(similar_products, key=lambda x: x["similarity_score"], reverse=True)[:5]
