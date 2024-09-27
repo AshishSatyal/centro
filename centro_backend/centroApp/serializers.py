@@ -84,11 +84,14 @@ class TransactionSerializer(serializers.ModelSerializer):
         fields = ['product', 'quantity', 'total_price', 'transaction_date']
 
 class SavedItemSerializer(serializers.ModelSerializer):
-    product_name = serializers.ReadOnlyField(source='product.name')
+    name = serializers.ReadOnlyField(source='product.name')
+    image = serializers.ImageField(source='product.image', read_only=True)
+    condition = serializers.ReadOnlyField(source='product.condition')
+    price = serializers.ReadOnlyField(source='product.price')
 
     class Meta:
         model = SavedItem
-        fields = ['id', 'user', 'product', 'product_name', 'saved_at']
+        fields = ['id', 'user', 'product', 'name', 'image', 'condition', 'price', 'saved_at']
         read_only_fields = ['user', 'saved_at']
 
 class PremiumMembershipSerializer(serializers.ModelSerializer):
