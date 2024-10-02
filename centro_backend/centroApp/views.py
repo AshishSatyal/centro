@@ -73,7 +73,6 @@ class LoginView(APIView):
 class UserView(APIView):
     permission_classes = [IsAuthenticated]
   
-
     def get(self, request):
         user = request.user
         serializer = UserSerializer(user)
@@ -117,11 +116,15 @@ class ProductView(APIView):
 #Delete,Update and view individual product
 class IndividualProductView(APIView):
     permission_classes = (IsAuthenticated,)
-    def get(self,request,pk):
-        product = Product.objects.get(id=pk)
-        serializer = ProductSerializer(product)
-        return Response(serializer.data)
-    
+   
+    def get(self, request, pk):
+        try:
+            product = Product.objects.get(id=pk)
+            serializer = ProductSerializer(product)
+            return Response(serializer.data)
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
+
     def delete(self, request, pk):
         try:
             product = Product.objects.get(id=pk)
@@ -451,7 +454,7 @@ class PurchasePremiumMembershipView(APIView):
 
     def post(self, request):
         user = request.user
-        subPaisa = 20000
+        subPaisa = 200000
         pxid = str(uuid.uuid4())
         return_url = "premium/membership/success/"
         # Khalti payment initiation logic
@@ -546,3 +549,31 @@ class TrendingProductView(APIView):
         # Serialize the trending products
         serializer = ProductSerializer(trending_products, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class UserProductListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Filter products by the logged-in user
+        user = request.user
+        products = Product.objects.filter(userName=user)
+
+        serializer = ProductSerializer(products, many=True)
+
+        return Response(serializer.data, status=200)
+    
+class UserProductDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        try:
+            product = Product.objects.get(id=pk)
+
+            if product.userName != request.user:
+                return Response({"error": "You do not have permission to delete this product."}, status=status.HTTP_403_FORBIDDEN)
+            
+            product.delete()
+            return Response({'message': 'Product deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
