@@ -434,20 +434,28 @@ class SavedItemView(APIView):
         return Response(serializer.data)
 
     def post(self, request, product_id):
-        # Check if the product exists
         try:
             product = Product.objects.get(id=product_id)
         except Product.DoesNotExist:
             return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Check if the product is already saved
         if SavedItem.objects.filter(user=request.user, product=product).exists():
             return Response({"message": "Product already in saved items"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Save the product to saved items
         saved_item = SavedItem.objects.create(user=request.user, product=product)
         serializer = SavedItemSerializer(saved_item)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def delete(self, request, product_id):
+        # Check if the product is saved by the user
+        try:
+            saved_item = SavedItem.objects.get(user=request.user, product_id=product_id)
+        except SavedItem.DoesNotExist:
+            return Response({"error": "Saved product not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        
+        saved_item.delete()
+        return Response({"message": "Product removed from saved items"}, status=status.HTTP_204_NO_CONTENT)
 
 class PurchasePremiumMembershipView(APIView):
     permission_classes = [IsAuthenticated]
