@@ -25,7 +25,7 @@ const ProductPage = () => {
       setProduct(response.data);
     };
     fetched();
-  }, []);
+  }, [id]);
 
   const productEl = (
     <div className='w-fit'>

@@ -17,7 +17,7 @@ const SaveProduct = ({ id }) => {
 
   return (
     <CiSaveDown2
-      className='text-3xl cursor-pointer hover:scale-x-75'
+      className='text-3xl cursor-pointer hover:scale-x-75 transition-all'
       onClick={handleClick}
     />
   );

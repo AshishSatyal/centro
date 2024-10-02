@@ -13,7 +13,7 @@ const Product = () => {
     };
     fetchProducts();
   }, []);
-
+  console.log(products);
   return (
     <div className='flex flex-col gap-5 border-x-2 p-10'>
       {products.map((product) => (
