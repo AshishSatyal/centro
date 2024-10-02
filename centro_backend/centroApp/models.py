@@ -37,6 +37,7 @@ class User(AbstractUser):
     lastname = models.CharField(max_length=255)
     email = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
+    number = models.CharField(max_length=255)
     username = None
 
     USERNAME_FIELD = 'email'
@@ -120,6 +121,12 @@ class PremiumMembership(models.Model):
 
     def is_active(self):
         return timezone.now() < self.expiration_date
+    
+    def save(self, *args, **kwargs):
+        # Automatically set is_purchased to False if expiration_date has passed
+        if self.expiration_date and timezone.now() >= self.expiration_date:
+            self.is_purchased = False
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return f"Premium Member: {self.user.email}"

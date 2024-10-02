@@ -2,15 +2,48 @@ from rest_framework import serializers
 from .models import PremiumMembership, SavedItem, Transaction, User,Product,UserLocation,Comment
 
 
+# class UserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ['id', 'firstname', 'lastname', 'email', 'password', 'number']
+#         extra_kwargs = {
+#             'password': {'write_only': True}
+#         }
+
+#     def create(self, validated_data):
+#         password = validated_data.pop('password', None)
+#         instance = self.Meta.model(**validated_data)
+#         if password:
+#             instance.set_password(password)
+#         instance.save()
+#         return instance
+
+
 class UserSerializer(serializers.ModelSerializer):
+    is_member = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'firstname', 'lastname', 'email', 'password']
+        # Exclude 'password' from the response and include necessary fields
+        fields = ['id', 'firstname', 'lastname', 'email', 'number', 'is_member']
         extra_kwargs = {
-            'password': {'write_only': True}
+            'password': {'write_only': True}  # Ensure password is write-only
         }
 
+    def get_is_member(self, obj):
+        """
+        Retrieves the is_purchased status from the PremiumMembership model.
+        Returns False if the PremiumMembership does not exist.
+        """
+        try:
+            return obj.premiummembership.is_purchased
+        except PremiumMembership.DoesNotExist:
+            return False
+
     def create(self, validated_data):
+        """
+        Handles user creation by setting the password correctly.
+        """
         password = validated_data.pop('password', None)
         instance = self.Meta.model(**validated_data)
         if password:
@@ -22,6 +55,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     user_firstname = serializers.SerializerMethodField()
     user_lastname = serializers.SerializerMethodField()
+    number = serializers.SerializerMethodField()
     class Meta:
         model = Product
         fields = '__all__'
@@ -31,6 +65,10 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_user_lastname(self, obj):
         return obj.userName.lastname if obj.userName else None
+    
+    def get_number(self, obj):
+        # Get the phone number (or any other field) from the related user
+        return obj.userName.number if hasattr(obj.userName, 'number') else None
 
 class ResetPasswordRequestSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
