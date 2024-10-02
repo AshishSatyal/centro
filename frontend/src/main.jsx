@@ -14,6 +14,8 @@ import Layout from "./component/Layout.jsx";
 import Search from "./pages/Search.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import Saved from "./pages/Saved.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Router>
@@ -26,6 +28,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path={`/product`} element={<Product />} />
           <Route path='' element={<Layout />}>
             <Route path='/' element={<App />} />
+            <Route path='/profile' element={<ProfilePage />} />
             <Route path={`/add-product`} element={<AddProduct />} />
             <Route path={`/product/:id`} element={<ProductPage />} />
             <Route path='/search/:query' element={<Search />} />
