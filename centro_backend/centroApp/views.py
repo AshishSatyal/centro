@@ -32,6 +32,7 @@ import requests
 import json
 from datetime import datetime, timedelta
 from django.utils import timezone
+from django.db.models import Q
 
 
 # Create your views here.
@@ -70,21 +71,13 @@ class LoginView(APIView):
 
 
 class UserView(APIView):
+    permission_classes = [IsAuthenticated]
+  
+
     def get(self, request):
-        token = request.COOKIES.get('jwt')
-
-        if not token:
-            raise AuthenticationFailed('Unauthenticated!')
-
-        try:
-            # Specify the algorithm(s) used for decoding
-            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
-        except jwt.ExpiredSignatureError:
-            raise AuthenticationFailed('Unauthenticated!')
-
-        user = User.objects.filter(id=payload['id']).first()
+        user = request.user
         serializer = UserSerializer(user)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -163,10 +156,20 @@ class SearchProductView(APIView):
      permission_classes = (IsAuthenticated,)
 
      def get(self, request):
-        product_name = request.query_params.get('name', '')  # Retrieve the 'name' parameter from the query string
-        products = Product.objects.filter(name__icontains=product_name)  # Use 'icontains' for case-insensitive matching
+        # Get the search query from the request
+        search_query = request.query_params.get('q', None)
+        
+        if search_query:
+            # Perform filtering using Q objects
+            products = Product.objects.filter(
+                Q(name__icontains=search_query) | Q(category__icontains=search_query)
+            )
+        else:
+            products = Product.objects.all()
+
+        # Serialize the filtered products
         serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class RequestPasswordReset(generics.GenericAPIView):
@@ -448,7 +451,7 @@ class PurchasePremiumMembershipView(APIView):
 
     def post(self, request):
         user = request.user
-        subPaisa = 10000  # example amount in paisa (100.00 for the purchase)
+        subPaisa = 20000
         pxid = str(uuid.uuid4())
         return_url = "premium/membership/success/"
         # Khalti payment initiation logic
@@ -457,7 +460,7 @@ class PurchasePremiumMembershipView(APIView):
         payload = json.dumps({
             "return_url": "http://127.0.0.1:8000/"+return_url,
             "website_url": "http://127.0.0.0:8000",
-            "amount": "1000",
+            "amount": subPaisa,
             "purchase_order_id": pxid,
             "purchase_order_name": "Membership",
             "customer_info": {

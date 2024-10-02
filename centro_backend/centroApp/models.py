@@ -57,6 +57,7 @@ class Product(models.Model):
     sold = models.BooleanField(default=False)
     userName = models.ForeignKey(User, on_delete=models.CASCADE)
     location = models.CharField(max_length=255)
+    category = models.CharField(max_length=255)
 
     def reduce_stock(self, quantity):
         if quantity > self.countInStock:
