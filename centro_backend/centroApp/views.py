@@ -249,11 +249,9 @@ class ResetPassword(generics.GenericAPIView):
         
 
 def calculate_cosine_similarity(vector1, vector2):
-    # Convert the vectors to numpy arrays for easier mathematical operations
     v1 = np.array(vector1)
     v2 = np.array(vector2)
     
-    # Calculate the dot product of the two vectors
     dot_product = np.dot(v1, v2)
     
     # Calculate the magnitude (Euclidean norm) of each vector
@@ -263,7 +261,6 @@ def calculate_cosine_similarity(vector1, vector2):
     # To avoid division by zero
     epsilon = 1e-10
     
-    # Calculate the cosine similarity
     return dot_product / (magnitude_v1 * magnitude_v2 + epsilon)
 
 def text_to_vector(texts):
@@ -290,15 +287,15 @@ class SimilarityAPIView(APIView):
         product_list.append(target_product_text)
 
         # Convert product descriptions to vectors using TF-IDF
-        vectors = text_to_vector(product_list)
+        vectors = text_to_vector(product_list).toarray()  # Convert sparse matrix to dense numpy array
 
-        # Get the vector for the target product
         target_vector = vectors[-1]
 
-        # Calculate cosine similarity between the target product and all other products
-        similarity_scores = cosine_similarity(target_vector, vectors[:-1]).flatten()
+        # Calculate cosine similarity manually for each product
+        similarity_scores = []
+        for vector in vectors[:-1]:  # Exclude the target product itself
+            similarity_scores.append(calculate_cosine_similarity(target_vector, vector))
 
-        # Prepare the response data
         similar_products = []
         for i, product in enumerate(products):
             similarity_score = similarity_scores[i]
@@ -311,11 +308,10 @@ class SimilarityAPIView(APIView):
                     "image": product.image.url if product.image else None,
                     "condition": product.condition,
                     "category": product.category,
-                    "similarity_score": similarity_scores[i]
+                    "similarity_score": similarity_score
                 }
                 similar_products.append(product_data)
 
-        # Sort by similarity score in descending order and take top 5
         similar_products = sorted(similar_products, key=lambda x: x["similarity_score"], reverse=True)[:5]
 
         response_data = {
