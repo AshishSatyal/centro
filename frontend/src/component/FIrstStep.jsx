@@ -1,6 +1,6 @@
 import React from "react";
 
-const FIrstStep = ({ values, handleChange }) => {
+const FIrstStep = ({ values, handleChange, handleImageUpload }) => {
   return (
     <div className='flex flex-col justify-center items-start gap-2'>
       <div className='flex flex-col gap-1 w-full'>
@@ -27,6 +27,7 @@ const FIrstStep = ({ values, handleChange }) => {
           onChange={handleChange}
         />
       </div>
+
       <div className='flex flex-col gap-1 w-full'>
         <label htmlFor='description'>Description</label>
         <textarea
@@ -38,6 +39,26 @@ const FIrstStep = ({ values, handleChange }) => {
           className='border rounded-xl w-full h-16'
         ></textarea>
       </div>
+      <div className='flex flex-col gap-1 w-full'>
+        <label htmlFor='image'>Upload Image</label>
+        <input
+          type='file'
+          name='image'
+          id='image'
+          accept='image/*'
+          onChange={handleImageUpload}
+          className='border rounded-xl w-full h-10'
+        />
+      </div>
+      {values.imagePreview && (
+        <div className='flex justify-center items-center mt-4'>
+          <img
+            src={values.imagePreview}
+            alt='Product Preview'
+            className='rounded-lg w-32 h-32 object-cover'
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -4,11 +4,11 @@ import { Link } from "react-router-dom";
 import Comment from "./Comment";
 
 const ProductItem = ({ product }) => {
-  console.log(product.id);
+  // console.log(product.id);
   const _id = product.id ?? product.product_id;
   return (
     <Link to={`/product/${_id}`}>
-      <div className='relative hover:shadow border rounded-lg w-[30rem] h-40 transition-all'>
+      <div className='relative hover:shadow border rounded-lg w-[35rem] h-40 transition-all'>
         <div className='flex w-full h-full'>
           <div className='p-2 w-[30%] h-full'>
             <img

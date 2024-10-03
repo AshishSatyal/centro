@@ -5,12 +5,17 @@ import FIrstStep from "../component/FIrstStep";
 import SecondStep from "../component/SecondStep";
 import ThirdStep from "../component/ThirdStep";
 import { json } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 const AddProduct = () => {
+  const { userDetail } = useUser();
+  console.log(userDetail);
   const [activeStep, setActiveStep] = useState(1);
 
   const [formdata, setFormData] = useState({
+    userName: userDetail.id,
     name: undefined,
+    image: undefined,
     price: undefined,
     description: undefined,
     condition: undefined,
@@ -24,19 +29,16 @@ const AddProduct = () => {
 
   const handleSubmit = async () => {
     console.log("clicking");
-    const requestBody = new URLSearchParams();
-    Object.keys(formdata).forEach((each) =>
-      requestBody.append(each, formdata[each])
-    );
-    // const requestBody = JSON.stringify(formdata);
+
+    const formData = new FormData();
+    Object.keys(formdata).forEach((key) => {
+      formData.append(key, formdata[key]);
+    });
+
     try {
-      // console.log(formBody);
       await fetch("http://127.0.0.1:8000/centroApp/Product/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: requestBody,
+        body: formData,
       });
     } catch (err) {
       console.log(err);
@@ -52,6 +54,17 @@ const AddProduct = () => {
       };
     });
   }
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      handleChange({
+        target: {
+          name: "image",
+          value: file, // Append file directly to the formdata
+        },
+      });
+    }
+  };
 
   console.log(formdata);
 
@@ -74,7 +87,11 @@ const AddProduct = () => {
               activeStep={1}
             />
             {activeStep === 1 && (
-              <FIrstStep values={formdata} handleChange={handleChange} />
+              <FIrstStep
+                values={formdata}
+                handleChange={handleChange}
+                handleImageUpload={handleImageUpload}
+              />
             )}
             {activeStep === 2 && (
               <SecondStep values={formdata} handleChange={handleChange} />

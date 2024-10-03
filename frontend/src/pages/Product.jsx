@@ -13,9 +13,9 @@ const Product = () => {
     };
     fetchProducts();
   }, []);
-  console.log(products);
+  // console.log(products);
   return (
-    <div className='flex flex-col gap-5 border-x-2 p-10'>
+    <div className='flex flex-col gap-5 border-2 border-x-2 p-10 w-[60%]'>
       {products.map((product) => (
         <div>
           <ProductItem key={product.id} product={product} />
