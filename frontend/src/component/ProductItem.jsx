@@ -8,7 +8,7 @@ const ProductItem = ({ product }) => {
   const _id = product.id ?? product.product_id;
   return (
     <Link to={`/product/${_id}`}>
-      <div className='relative hover:shadow border rounded-lg w-[35rem] h-52 transition-all'>
+      <div className='relative hover:shadow border border-black rounded-lg w-[35rem] h-52 transition-all'>
         <div className='flex w-full h-full'>
           <div className='p-2 w-[30%] h-full'>
             <img
@@ -19,8 +19,8 @@ const ProductItem = ({ product }) => {
           </div>
 
           <div className='flex flex-col w-[70%]'>
-            <p className='text-xl'>{product.name}</p>
-            <p className='text-gray-600 text-sm'>{product.description}</p>
+            <p className='mt-2 text-xl'>{product.name}</p>
+            <p className='mt-2 text-gray-600 text-sm'>{product.description}</p>
             <p className='pt-2 pr-2 text-gray-500 text-xs'>
               {product.category}
             </p>

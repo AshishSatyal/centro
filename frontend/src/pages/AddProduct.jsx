@@ -4,16 +4,22 @@ import { Step, Stepper } from "react-form-stepper";
 import FIrstStep from "../component/FIrstStep";
 import SecondStep from "../component/SecondStep";
 import ThirdStep from "../component/ThirdStep";
-import { json } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AddProduct = () => {
+  const navigate = useNavigate();
   const { userDetail } = useUser();
-  console.log(userDetail);
-  const [activeStep, setActiveStep] = useState(1);
 
+  // Use a fallback value for userName, defaulting to 0 if userDetail is not available
+  const userId = userDetail?.id ? Number(userDetail.id) : 1;
+
+  const [activeStep, setActiveStep] = useState(1);
   const [formdata, setFormData] = useState({
-    userName: userDetail.id,
+    userName: userId,
     name: undefined,
     image: undefined,
     price: undefined,
@@ -23,49 +29,50 @@ const AddProduct = () => {
     usedFor: undefined,
     location: undefined,
     locationDescription: undefined,
-    // sold: false,
     countInStock: 3,
   });
 
   const handleSubmit = async () => {
-    console.log("clicking");
-
     const formData = new FormData();
     Object.keys(formdata).forEach((key) => {
       formData.append(key, formdata[key]);
     });
 
     try {
-      await fetch("http://127.0.0.1:8000/centroApp/Product/", {
+      const response = await fetch("http://127.0.0.1:8000/centroApp/Product/", {
         method: "POST",
         body: formData,
       });
+      if (response.ok) {
+        toast.success("Product added successfully!");
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      }
     } catch (err) {
       console.log(err);
     }
   };
 
-  function handleChange(e) {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((preValues) => {
-      return {
-        ...preValues,
-        [name]: value,
-      };
-    });
-  }
+    setFormData((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       handleChange({
         target: {
           name: "image",
-          value: file, // Append file directly to the formdata
+          value: file,
         },
       });
     }
   };
-
   console.log(formdata);
 
   return (
@@ -84,7 +91,7 @@ const AddProduct = () => {
                 { label: "Product Specification", active: activeStep === 2 },
                 { label: "Location", active: activeStep === 3 },
               ]}
-              activeStep={1}
+              activeStep={activeStep}
             />
             {activeStep === 1 && (
               <FIrstStep
@@ -104,16 +111,16 @@ const AddProduct = () => {
                 className='bg-black rounded-xl w-24 h-10 text-white'
                 onClick={(e) => {
                   e.preventDefault();
-                  setActiveStep(activeStep == 1 ? activeStep : activeStep - 1);
+                  setActiveStep(activeStep === 1 ? activeStep : activeStep - 1);
                 }}
                 type='button'
               >
                 Back
               </button>
-              {activeStep == 3 ? (
+              {activeStep === 3 ? (
                 <button
                   className='bg-slate-200 rounded-xl w-24 h-10'
-                  onClick={(e) => handleSubmit()}
+                  onClick={handleSubmit}
                   type='submit'
                 >
                   Submit
@@ -134,6 +141,17 @@ const AddProduct = () => {
           </form>
         </div>
       </div>
+      <ToastContainer
+        position='top-right'
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </CenterComponent>
   );
 };

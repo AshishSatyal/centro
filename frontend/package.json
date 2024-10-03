@@ -14,8 +14,11 @@
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^6.1.1",
     "@mui/material": "^6.1.1",
+    "antd": "^5.21.2",
     "axios": "^1.7.7",
     "classnames": "^2.5.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.11.0",
     "leaflet": "^1.9.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -23,7 +26,9 @@
     "react-hook-form": "^7.52.1",
     "react-icons": "^5.3.0",
     "react-leaflet": "^4.2.1",
-    "react-router-dom": "^6.24.0"
+    "react-router-dom": "^6.24.0",
+    "react-toastify": "^10.0.5",
+    "tailwind-merge": "^2.5.2"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

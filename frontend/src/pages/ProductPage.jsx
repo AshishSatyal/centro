@@ -28,9 +28,9 @@ const ProductPage = () => {
   }, [id]);
 
   const productEl = (
-    <div className='w-fit'>
+    <div className='border-2 w-fit'>
       <div className='flex items-center gap-5 w-full h-full'>
-        <div className='p-2 border-red-600 w-[20%] h-full'>
+        <div className='p-2 w-[20%] h-full'>
           <img
             className='w-full h-full'
             src={`http://127.0.0.1:8000${product.image}`}

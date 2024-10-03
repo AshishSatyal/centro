@@ -3,6 +3,9 @@ import CenterComponent from "../component/CenterComponent";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   const { setTokens } = useAuth();
@@ -16,27 +19,37 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/centroApp/login/",
+      const response = await fetch("http://127.0.0.1:8000/centroApp/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
       if (response.ok) {
         const result = await response.json();
         const { access, refresh } = result;
+        toast.success("Login successful! Redirecting to Home...");
 
         setTokens({ access, refresh });
-        navigate("/");
+
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      } else {
+        // Handle login failure
+        const errorData = await response.json();
+        setError("email", {
+          message: errorData.detail || "Invalid email or password",
+        });
+        setError("password", {
+          message: errorData.detail || "Invalid email or password",
+        });
       }
     } catch (err) {
       setError("email", {
-        message: "Invalid email or password",
+        message: "Something went wrong. Please try again.",
       });
     }
   };
@@ -78,6 +91,11 @@ const Login = () => {
                   id='password'
                   placeholder='password'
                 />
+                {errors.password && (
+                  <div className='font-semibold text-red-600 text-sm'>
+                    {errors.password.message}
+                  </div>
+                )}
               </div>
               <div>
                 <button className='hover:border-slate-500 my-5 border border-black rounded-xl w-[15rem] h-10'>
@@ -94,6 +112,17 @@ const Login = () => {
           </div>
         </div>
       </div>
+      <ToastContainer
+        position='top-right'
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </CenterComponent>
   );
 };

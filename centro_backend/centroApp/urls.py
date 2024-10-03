@@ -3,7 +3,7 @@ from .views import PremiumMembershipSuccessView, PurchasePremiumMembershipView, 
       LogoutView,ProductView,IndividualProductView,SearchProductView,\
         RequestPasswordReset,ResetPassword,SimilarityAPIView,MidpointView\
         ,CommentListCreateView,UserProductListView,UserProductDeleteView\
-        ,DeleteAccountView
+        ,DeleteAccountView,SavedItemDeleteView
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -30,6 +30,8 @@ urlpatterns = [
     path('transactions/history/', TransactionHistoryView.as_view()),
     path('products/<int:product_id>/save/', SavedItemView.as_view()),
     path('saved-items/', SavedItemView.as_view(), name='saved-items-list'),
+    path('saved-item/<int:pk>/delete/', SavedItemDeleteView.as_view(), name='saved-item-delete'),
+
     path('trendingProducts/', TrendingProductView.as_view()),
     path('userProductView/', UserProductListView.as_view()),
     path('userProductDeleteView/<int:pk>/', UserProductDeleteView.as_view()),

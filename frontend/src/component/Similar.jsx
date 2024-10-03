@@ -22,11 +22,10 @@ const Similar = () => {
   }, [id]);
 
   const similarEl = similarProduct?.map((item) => {
-    console.log(item);
     return <ProductItem key={item.id} product={item} />;
   });
 
-  return <div>{similarEl}</div>;
+  return <div className='flex flex-wrap gap-4'>{similarEl}</div>;
 };
 
 export default Similar;

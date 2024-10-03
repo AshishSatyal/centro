@@ -1,51 +1,54 @@
-// src/pages/SearchResults.js
 import React, { useEffect, useState } from "react";
+import useAxios from "../util/axios";
 import { useParams } from "react-router-dom";
 import ProductItem from "../component/ProductItem";
-import CenterComponent from "../component/CenterComponent";
-import useAxios from "../util/axios";
 import Trending from "../component/Trending";
+import CenterComponent from "../component/CenterComponent";
 
-const SearchResults = () => {
+const Category = () => {
+  const { category } = useParams();
+  console.log(category);
+  const [result, setResult] = useState([]);
+  //   const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false); // State for loading status
   const axiosInstance = useAxios();
-  const { query } = useParams(); // Extract the query parameter from the URL
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchResults = async () => {
-      if (!query) return;
+      if (!category) return; // Don't fetch if query is empty
+
       setLoading(true);
       try {
         const response = await axiosInstance.get(
           `http://127.0.0.1:8000/centroApp/searchProduct/?q=${encodeURIComponent(
-            query
+            category
           )}`
         );
-
-        setResults(response.data);
+        setResult(response.data);
       } catch (error) {
         console.error("Error fetching search results:", error);
       } finally {
         setLoading(false);
       }
     };
+
     fetchResults();
-  }, [query]);
-  console.log(results);
+  }, [category]); // Added axiosInstance to dependencies
 
   return (
     <CenterComponent>
+      <h1 className='mt-5 text-xl capitalize'>{category}</h1>
       <div className='flex justify-between gap-40 w-full'>
         <div className='w-fit search-results'>
-          <h1 className='my-5'>Search Results for "{query}"</h1>
           {loading && <p>Loading...</p>}
 
-          {results?.map((item) => (
-            <ProductItem key={item.id} product={item} />
+          {result?.map((item) => (
+            <div className='mt-4'>
+              <ProductItem key={item.id} product={item} />
+            </div>
           ))}
         </div>
-        <div className='border border-red-400 w-[40%]'>
+        <div className='w-[40%]'>
           <Trending />
         </div>
       </div>
@@ -53,4 +56,4 @@ const SearchResults = () => {
   );
 };
 
-export default SearchResults;
+export default Category;

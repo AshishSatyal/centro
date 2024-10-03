@@ -18,6 +18,7 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 import PaymentValidate from "./pages/PaymentValidate.jsx";
 import { UserProvider } from "./context/UserContext.jsx";
 import Buy from "./pages/Buy.jsx";
+import Category from "./pages/Category.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -37,6 +38,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               <Route path='/profile' element={<ProfilePage />} />
               <Route path={`/add-product`} element={<AddProduct />} />
               <Route path={`/product/:id`} element={<ProductPage />} />
+              <Route path={`/category/:category`} element={<Category />} />
               <Route path='/search/:query' element={<Search />} />
               <Route path='/saved-product' element={<Saved />} />
             </Route>

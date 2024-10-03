@@ -1,7 +1,10 @@
 import React from "react";
 import CenterComponent from "../component/CenterComponent";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Signup = () => {
   const {
@@ -10,16 +13,25 @@ const Signup = () => {
     formState: { errors },
     setError,
   } = useForm();
-
+  const navigate = useNavigate();
   const onSubmit = async (data) => {
     try {
-      await fetch("http://127.0.0.1:8000/centroApp/register/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        "http://127.0.0.1:8000/centroApp/register/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+      if (response.ok) {
+        toast.success("Registration successful! Redirecting to login...");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      }
     } catch (err) {
       setError("email", {
         message: "Email already exists",
@@ -201,6 +213,17 @@ const Signup = () => {
           </div>
         </div>
       </div>
+      <ToastContainer
+        position='top-right'
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </CenterComponent>
   );
 };

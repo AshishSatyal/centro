@@ -14,7 +14,7 @@ function App() {
         <NavSmall />
       </div> */}
 
-      <div className='flex justify-around w-full'>
+      <div className='flex justify-around gap-10 w-full'>
         <Product />
         <Trending />
       </div>

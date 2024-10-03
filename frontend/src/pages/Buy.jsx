@@ -6,6 +6,18 @@ import { useParams } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 
 const MapWrapper = () => {
+  const customPopup = (
+    <iframe
+      width='auto'
+      title='Marek Grechuta'
+      height='310'
+      src='https://www.youtube.com/embed/glKDhBuoRUs'
+      frameBorder='0'
+      allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture'
+      allowFullScreen
+    ></iframe>
+  );
+
   const center = [27.7159446, 85.329119];
   const { id } = useParams();
   const axiosInstance = useAxios();
@@ -77,7 +89,7 @@ const MapWrapper = () => {
       <MapContainer
         className='p-10 w-full h-[100vh]'
         center={center}
-        zoom={10}
+        zoom={15}
         scrollWheelZoom={false}
       >
         <TileLayer {...tileLayer} />
