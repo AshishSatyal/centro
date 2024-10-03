@@ -18,15 +18,15 @@ const MapWrapper = () => {
 
   useEffect(() => {
     const getMid = async () => {
-      const response = await axiosInstance.post("/centroApp/midpointView/")({
-        id: id,
+      const response = await axiosInstance.post("/centroApp/midpointView/", {
+        id: Number(id),
         latitude: latitude,
         longitude: longitude,
       });
       setMid(response.data);
     };
     getMid();
-  });
+  }, []);
   const points = [
     {
       lat: 27.8159446,
@@ -48,18 +48,10 @@ const MapWrapper = () => {
     ));
   };
   const { id } = useParams();
-  const [product, setProduct] = useState([]);
+  console.log(id);
+
   const axiosInstance = useAxios();
 
-  //   useEffect(() => {
-  //     const fetchProduct = async () => {
-  //       const response = await axiosInstance.get(
-  //         `/centroApp/selectedProduct/${id}`
-  //       );
-  //       setProduct(response.data);
-  //     };
-  //     fetchProduct();
-  //   }, []);
   return (
     <div>
       <MapContainer
