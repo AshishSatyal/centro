@@ -466,7 +466,7 @@ class PurchasePremiumMembershipView(APIView):
 
     def post(self, request):
         user = request.user
-        subPaisa = 200000
+        subPaisa = 100000
         pxid = str(uuid.uuid4())
         return_url = "Payment-validate/"
         # Khalti payment initiation logic
