@@ -343,45 +343,51 @@ class MidpointView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
-        # Get the currently logged-in user's location
-        try:
-            user_location = UserLocation.objects.get(user=request.user)
-        except UserLocation.DoesNotExist:
-            return Response({"error": "User location not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        # Validate and extract location from the POST request
+        # Validate and extract user-provided location and product ID from the POST request
         serializer = UserProductIdSerializer(data=request.data)
-        print("Request Data:", request.data)
         if serializer.is_valid():
+            # Extract the product ID
             product_id = serializer.validated_data.get('id')
 
-            user_id = Product.objects.get(id=product_id).userName_id
+            # Retrieve the product from the database
+            try:
+                product = Product.objects.get(id=product_id)
+            except Product.DoesNotExist:
+                return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
 
-            userProduct_location = UserLocation.objects.get(user_id=user_id)
-            
-            # Extract user's latitude and longitude via frontend request
-            provided_lat = userProduct_location.latitude
-            provided_lon = userProduct_location.longitude
+            # Extract the product's location field (assuming it's in "latitude,longitude" format)
+            try:
+                product_location = product.location
+                product_lat, product_lon = map(float, product_location.split(","))
+            except (ValueError, AttributeError):
+                return Response({"error": "Invalid product location format."}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Extract user's latitude and longitude
-            user_lat = user_location.latitude
-            user_lon = user_location.longitude
+            # Extract the user's provided latitude and longitude from the request body
+            provided_lat = request.data.get('latitude')
+            provided_lon = request.data.get('longitude')
 
-            # Calculate the midpoint from two users locations
-            midpoint = find_midpoint(user_lat, user_lon, provided_lat, provided_lon)
+            if provided_lat is None or provided_lon is None:
+                return Response({"error": "User-provided latitude and longitude are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-            # return Response({
-            #     "user_lat":user_lat,
-            #     "user_lon":user_lon,
-            #     "midpoint_latitude": midpoint[0],
-            #     "midpoint_longitude": midpoint[1]
-            # })
+            try:
+                # Convert provided values to float
+                provided_lat = float(provided_lat)
+                provided_lon = float(provided_lon)
+            except ValueError:
+                return Response({"error": "Invalid latitude or longitude format."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Calculate the midpoint between the user-provided location and the product's location
+            midpoint = find_midpoint(provided_lat, provided_lon, product_lat, product_lon)
+
+            # Return the midpoint latitude and longitude in the response
             return Response({
                 "midpoint_latitude": midpoint[0],
                 "midpoint_longitude": midpoint[1]
-            })
-        
+            }, status=status.HTTP_200_OK)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
     
 class CommentListCreateView(generics.ListCreateAPIView):
     queryset = Comment.objects.all()
