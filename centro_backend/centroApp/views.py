@@ -267,13 +267,14 @@ class SimilarityAPIView(APIView):
         if products.count() < 1:
             return Response({"message": "No other products to calculate similarity"}, status=status.HTTP_400_BAD_REQUEST)
 
-        product_list = [f"{p.name} {p.description} {p.condition}" for p in products]
+        # Include product name and category for comparison
+        product_list = [f"{p.name} {p.category}" for p in products]
 
         # Add the target product to the list for vector comparison
-        target_product_text = f"{target_product.name} {target_product.description} {target_product.condition}"
+        target_product_text = f"{target_product.name} {target_product.category}"
         product_list.append(target_product_text)
 
-        # Convert product descriptions to vectors
+        # Convert product descriptions to vectors using TF-IDF
         vectors = text_to_vector(product_list)
 
         # Get the vector for the target product
@@ -285,16 +286,19 @@ class SimilarityAPIView(APIView):
         # Prepare the response data
         similar_products = []
         for i, product in enumerate(products):
-            product_data = {
-                "product_id": product.id,
-                "name": product.name,
-                "description": product.description,
-                "price": product.price,
-                "image": product.image.url if product.image else None,
-                "condition": product.condition,
-                "similarity_score": similarity_scores[i]
-            }
-            similar_products.append(product_data)
+            similarity_score = similarity_scores[i]
+            if similarity_score >= 0.10:
+                product_data = {
+                    "product_id": product.id,
+                    "name": product.name,
+                    "description": product.description,
+                    "price": product.price,
+                    "image": product.image.url if product.image else None,
+                    "condition": product.condition,
+                    "category": product.category,
+                    "similarity_score": similarity_scores[i]
+                }
+                similar_products.append(product_data)
 
         # Sort by similarity score in descending order and take top 5
         similar_products = sorted(similar_products, key=lambda x: x["similarity_score"], reverse=True)[:5]
