@@ -5,7 +5,6 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import BaseUserManager, AbstractUser
 from django.db import models
 
-from datetime import datetime, timedelta
 from django.utils import timezone
 
 
@@ -124,9 +123,15 @@ class PremiumMembership(models.Model):
         return timezone.now() < self.expiration_date
     
     def save(self, *args, **kwargs):
-        # Automatically set is_purchased to False if expiration_date has passed
-        if self.expiration_date and timezone.now() >= self.expiration_date:
-            self.is_purchased = False
+        if self.expiration_date:
+            # Ensure expiration_date is timezone-aware if it's not
+            if timezone.is_naive(self.expiration_date):
+                self.expiration_date = timezone.make_aware(self.expiration_date)
+
+            # Automatically set is_purchased to False if expiration_date has passed
+            if timezone.now() >= self.expiration_date:
+                self.is_purchased = False
+
         super().save(*args, **kwargs)
     
     def __str__(self):
