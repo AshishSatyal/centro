@@ -44,10 +44,7 @@ const ProductPage = () => {
           </div>
           <p className='my-4 text-xl'>{product.description}</p>
           <p className='my-4 border-b'>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Itaque,
-            quibusdam praesentium cupiditate sapiente voluptatem neque,
-            perspiciatis amet fugiat saepe ex, vitae provident mollitia debitis.
-            Neque omnis accusantium id harum non?
+            <span className='font-semibold'>Category:</span> {product.category}
           </p>
           <p className='my-2 font-semibold text-slate-500 text-xl'>
             Rs.{product.price}

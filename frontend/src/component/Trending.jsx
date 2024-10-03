@@ -20,7 +20,7 @@ const Trending = () => {
       <Link to={`/product/${product.id}`}>
         <div className='border rounded-xl w-full h-40'>
           <div className='flex justify-center items-center gap-4 w-full h-full'>
-            <div className='p-2 border-red-600 w-[40%] h-full'>
+            <div className='p-2 border-red-600 w-[30%] h-full'>
               <img
                 className='w-full h-full'
                 src={`http://127.0.0.1:8000${product.image}`}

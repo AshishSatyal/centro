@@ -8,7 +8,7 @@ const ProductItem = ({ product }) => {
   const _id = product.id ?? product.product_id;
   return (
     <Link to={`/product/${_id}`}>
-      <div className='relative hover:shadow border rounded-lg w-[35rem] h-40 transition-all'>
+      <div className='relative hover:shadow border rounded-lg w-[35rem] h-52 transition-all'>
         <div className='flex w-full h-full'>
           <div className='p-2 w-[30%] h-full'>
             <img
@@ -22,8 +22,7 @@ const ProductItem = ({ product }) => {
             <p className='text-xl'>{product.name}</p>
             <p className='text-gray-600 text-sm'>{product.description}</p>
             <p className='pt-2 pr-2 text-gray-500 text-xs'>
-              Lorem ipsum dolor sit amet consecur adipisicing elit. Doloremque
-              odio.
+              {product.category}
             </p>
             <div className='flex justify-between mt-auto'>
               <p className='pb-1 text-slate-500'>Rs.{product.price}</p>
