@@ -2,7 +2,9 @@ from django.urls import path
 from .views import PremiumMembershipSuccessView, PurchasePremiumMembershipView, PurchaseView, RegisterView, LoginView, SavedItemView, TransactionHistoryView, TrendingProductView, UserView,\
       LogoutView,ProductView,IndividualProductView,SearchProductView,\
         RequestPasswordReset,ResetPassword,SimilarityAPIView,MidpointView\
-        ,CommentListCreateView,UserProductListView,UserProductDeleteView
+        ,CommentListCreateView,UserProductListView,UserProductDeleteView\
+        ,DeleteAccountView
+
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -31,6 +33,7 @@ urlpatterns = [
     path('trendingProducts/', TrendingProductView.as_view()),
     path('userProductView/', UserProductListView.as_view()),
     path('userProductDeleteView/<int:pk>/', UserProductDeleteView.as_view()),
+    path('deleteAccount/', DeleteAccountView.as_view()),
 
     path('premium/membership/purchase/', PurchasePremiumMembershipView.as_view(), name='purchase_premium_membership'),
     path('premium/membership/success/<str:pidx>/<str:status>/', PremiumMembershipSuccessView.as_view(), name='membership_success'),

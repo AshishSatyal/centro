@@ -589,3 +589,12 @@ class UserProductDeleteView(APIView):
 
         except Product.DoesNotExist:
             return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+class DeleteAccountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+
+        return Response({"message": "Your account has been successfully deleted."}, status=status.HTTP_200_OK)
