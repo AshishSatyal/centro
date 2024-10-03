@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .serializers import CommentSerializer, SavedItemSerializer, TransactionSerializer, UserSerializer,ProductSerializer,\
     ResetPasswordRequestSerializer,\
-    ResetPasswordSerializer,LocationSerializer,UserProductIdSerializer
+    ResetPasswordSerializer,LocationSerializer,UserProductIdSerializer,UserResponseSerializer
 
 from .models import PremiumMembership, SavedItem, Transaction, User,Product,PasswordReset,UserLocation,Comment
 import jwt, datetime
@@ -75,7 +75,7 @@ class UserView(APIView):
   
     def get(self, request):
         user = request.user
-        serializer = UserSerializer(user)
+        serializer = UserResponseSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class LogoutView(APIView):
