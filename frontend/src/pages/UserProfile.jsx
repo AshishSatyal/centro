@@ -1,21 +1,11 @@
 import React, { useEffect, useState } from "react";
-import useAxios from "../util/axios";
+
+import { useUser } from "../context/UserContext";
 
 const ProfilePage = () => {
-  const axiosInstance = useAxios();
-  const [userData, setUserData] = useState({});
+  const { userDetail } = useUser();
+  console.log("user detail", userDetail);
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const response = await axiosInstance.get("/centroApp/user/");
-        setUserData(response.data);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
-    getData();
-  }, []);
   return (
     <div className='flex justify-center items-center bg-gray-100 p-6 min-h-screen'>
       <div className='bg-white shadow-lg p-8 rounded-lg w-full max-w-5xl'>

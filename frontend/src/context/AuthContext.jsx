@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
     setAuthTokens(tokens);
     localStorage.setItem("authTokens", JSON.stringify(tokens)); // Persist tokens in localStorage
   };
+
   const logout = async () => {
     try {
       await fetch("http://127.0.0.1:8000/centroApp/logout/", {

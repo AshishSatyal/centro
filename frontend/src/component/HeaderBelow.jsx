@@ -22,7 +22,7 @@ const HeaderBelow = () => {
       console.log("Error fetching membership URL", error);
     }
   };
-  console.log(url);
+  // console.log(url);
 
   return (
     <div className='flex justify-end items-center gap-8 bg-white shadow-xl pr-5 border-black rounded-lg w-full h-14'>

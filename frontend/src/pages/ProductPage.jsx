@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import CenterComponent from "../component/CenterComponent";
 import { useAuth } from "../context/AuthContext";
 import useAxios from "../util/axios";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import ProductItem from "../component/ProductItem";
 import Comment from "../component/Comment";
 import Similar from "../component/Similar";
@@ -55,6 +55,14 @@ const ProductPage = () => {
           <div className='flex justify-between py-2'>
             <p className='text-base capitalize'>Posted by user_abc</p>
             <p className='text-slate-500 capitalize'>5mins ago</p>
+          </div>
+          <div className='flex justify-center items-center mt-2'>
+            <Link
+              to={`/map-location/${id}`}
+              className='bg-black p-2 border rounded-xl w-full h-12 text-center text-white text-xl'
+            >
+              See on Map
+            </Link>
           </div>
         </div>
       </div>
