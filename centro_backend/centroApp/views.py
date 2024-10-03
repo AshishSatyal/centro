@@ -23,7 +23,6 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
 
-from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
 import math
@@ -248,8 +247,24 @@ class ResetPassword(generics.GenericAPIView):
         else: 
             return Response({'error':'No user found'}, status=404)
         
+
 def calculate_cosine_similarity(vector1, vector2):
-    return cosine_similarity([vector1], [vector2])[0][0]
+    # Convert the vectors to numpy arrays for easier mathematical operations
+    v1 = np.array(vector1)
+    v2 = np.array(vector2)
+    
+    # Calculate the dot product of the two vectors
+    dot_product = np.dot(v1, v2)
+    
+    # Calculate the magnitude (Euclidean norm) of each vector
+    magnitude_v1 = np.linalg.norm(v1)
+    magnitude_v2 = np.linalg.norm(v2)
+    
+    # To avoid division by zero
+    epsilon = 1e-10
+    
+    # Calculate the cosine similarity
+    return dot_product / (magnitude_v1 * magnitude_v2 + epsilon)
 
 def text_to_vector(texts):
     vectorizer = TfidfVectorizer()
@@ -278,7 +293,7 @@ class SimilarityAPIView(APIView):
         vectors = text_to_vector(product_list)
 
         # Get the vector for the target product
-        target_vector = vectors[-1]  # The last one corresponds to the target product
+        target_vector = vectors[-1]
 
         # Calculate cosine similarity between the target product and all other products
         similarity_scores = cosine_similarity(target_vector, vectors[:-1]).flatten()
@@ -343,19 +358,15 @@ class MidpointView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
-        # Validate and extract user-provided location and product ID from the POST request
         serializer = UserProductIdSerializer(data=request.data)
         if serializer.is_valid():
-            # Extract the product ID
             product_id = serializer.validated_data.get('id')
-
-            # Retrieve the product from the database
             try:
                 product = Product.objects.get(id=product_id)
             except Product.DoesNotExist:
                 return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
 
-            # Extract the product's location field (assuming it's in "latitude,longitude" format)
+            # Extract the product's location field
             try:
                 product_location = product.location
                 product_lat, product_lon = map(float, product_location.split(","))
@@ -376,19 +387,19 @@ class MidpointView(APIView):
             except ValueError:
                 return Response({"error": "Invalid latitude or longitude format."}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Calculate the midpoint between the user-provided location and the product's location
             midpoint = find_midpoint(provided_lat, provided_lon, product_lat, product_lon)
 
-            # Return the midpoint latitude and longitude in the response
             return Response({
                 "midpoint_latitude": midpoint[0],
-                "midpoint_longitude": midpoint[1]
+                "midpoint_longitude": midpoint[1],
+                "product_latitude": product_lat,
+                "product_longitude": product_lon,
+                "user_latitude": provided_lat,
+                "user_longitude": provided_lon
             }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-    
 class CommentListCreateView(generics.ListCreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
