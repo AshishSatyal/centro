@@ -18,7 +18,7 @@ const SearchResults = () => {
       setLoading(true);
       try {
         const response = await axiosInstance.get(
-          `http://127.0.0.1:8000/centroApp/searchProduct/?name=${encodeURIComponent(
+          `http://127.0.0.1:8000/centroApp/searchProduct/?q=${encodeURIComponent(
             query
           )}`
         );

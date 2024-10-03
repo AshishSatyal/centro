@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // useNavigate instead of redirect
+import { Link, redirect, useNavigate } from "react-router-dom"; // useNavigate instead of redirect
 import useAxios from "../util/axios";
 
 const HeaderBelow = () => {
@@ -12,16 +12,17 @@ const HeaderBelow = () => {
       const response = await axiosInstance.post(
         "/centroApp/premium/membership/purchase/"
       );
-      console.log("clicking");
 
       if (response.status === 200) {
-        setUrl(response.data);
-        // navigate(response.data); // navigate to the fetched URL
+        const paymentUrl = response.data.payment_url;
+        setUrl(paymentUrl);
+        window.location.href = paymentUrl;
       }
     } catch (error) {
       console.log("Error fetching membership URL", error);
     }
   };
+  console.log(url);
 
   return (
     <div className='flex justify-end items-center gap-8 bg-white shadow-xl pr-5 border-black rounded-lg w-full h-14'>

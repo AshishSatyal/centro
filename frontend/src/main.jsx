@@ -15,6 +15,7 @@ import Search from "./pages/Search.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import Saved from "./pages/Saved.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
+import PaymentValidate from "./pages/PaymentValidate.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -25,6 +26,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path='/login' element={<Login />} />
           <Route path='/forgotpassword' element={<ForgotPassword />} />
           <Route path={`/reset-password`} element={<ResetPassword />} />
+          <Route path={`/Payment-validate/`} element={<PaymentValidate />} />
           <Route path={`/product`} element={<Product />} />
           <Route path='' element={<Layout />}>
             <Route path='/' element={<App />} />

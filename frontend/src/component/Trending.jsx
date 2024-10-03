@@ -8,7 +8,7 @@ const Trending = () => {
 
   useEffect(() => {
     const fetchedProducts = async () => {
-      const response = await axiosInstance.get("/centroApp/Product/");
+      const response = await axiosInstance.get("/centroApp/trendingProducts/");
 
       setTrendingProducts(response.data);
     };
