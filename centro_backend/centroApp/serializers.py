@@ -20,36 +20,41 @@ from .models import PremiumMembership, SavedItem, Transaction, User,Product,User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    is_member = serializers.SerializerMethodField()
-
     class Meta:
         model = User
-        # Exclude 'password' from the response and include necessary fields
-        fields = ['id', 'firstname', 'lastname', 'email', 'number', 'is_member']
+        fields = ['id', 'firstname', 'lastname', 'email', 'password']
         extra_kwargs = {
-            'password': {'write_only': True}  # Ensure password is write-only
+            'password': {'write_only': True}
         }
 
-    def get_is_member(self, obj):
-        """
-        Retrieves the is_purchased status from the PremiumMembership model.
-        Returns False if the PremiumMembership does not exist.
-        """
-        try:
-            return obj.premiummembership.is_purchased
-        except PremiumMembership.DoesNotExist:
-            return False
-
     def create(self, validated_data):
-        """
-        Handles user creation by setting the password correctly.
-        """
         password = validated_data.pop('password', None)
         instance = self.Meta.model(**validated_data)
         if password:
             instance.set_password(password)
         instance.save()
         return instance
+
+class UserResponseSerializer(serializers.ModelSerializer):
+    is_member = serializers.SerializerMethodField()
+    expiration_date = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'firstname', 'lastname', 'email', 'number', 'is_member', 'expiration_date']
+
+    def get_is_member(self, obj):
+        try:
+            return obj.premiummembership.is_purchased
+        except PremiumMembership.DoesNotExist:
+            return False
+
+    def get_expiration_date(self, obj):
+        try:
+            return obj.premiummembership.expiration_date
+        except PremiumMembership.DoesNotExist:
+            return None
+
 
 class ProductSerializer(serializers.ModelSerializer):
 
