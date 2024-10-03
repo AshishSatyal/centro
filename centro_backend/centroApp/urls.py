@@ -35,7 +35,7 @@ urlpatterns = [
     path('trendingProducts/', TrendingProductView.as_view()),
     path('userProductView/', UserProductListView.as_view()),
     path('userProductDeleteView/<int:pk>/', UserProductDeleteView.as_view()),
-    path('deleteAccount/', DeleteAccountView.as_view()),
+    path('userAccountDelete/', DeleteAccountView.as_view()),
 
     path('premium/membership/purchase/', PurchasePremiumMembershipView.as_view(), name='purchase_premium_membership'),
     path('premium/membership/success/<str:pidx>/<str:status>/', PremiumMembershipSuccessView.as_view(), name='membership_success'),

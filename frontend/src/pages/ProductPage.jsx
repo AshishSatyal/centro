@@ -50,8 +50,12 @@ const ProductPage = () => {
             Rs.{product.price}
           </p>
           <div className='flex justify-between py-2'>
-            <p className='text-base capitalize'>Posted by user_abc</p>
-            <p className='text-slate-500 capitalize'>5mins ago</p>
+            <p className='text-base capitalize'>
+              {product.user_firstname + " " + product.user_lastname}
+            </p>
+            <p className='text-slate-500 capitalize'>
+              {product?.uploaded_at?.split("T")[0]}
+            </p>
           </div>
           <div className='flex justify-center items-center mt-2'>
             <Link
@@ -73,7 +77,7 @@ const ProductPage = () => {
       <div className='w-fit'>
         <p className='border-b text-lg capitalize'>Similar Products</p>
       </div>
-      <Similar />
+      {/* <Similar /> */}
     </div>
   );
 };

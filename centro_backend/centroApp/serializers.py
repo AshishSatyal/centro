@@ -18,14 +18,14 @@ from .models import PremiumMembership, SavedItem, Transaction, User,Product,User
 #         instance.save()
 #         return instance
 
-
 class UserSerializer(serializers.ModelSerializer):
     is_member = serializers.SerializerMethodField()
+    expiration_date = serializers.SerializerMethodField()  # Declare the expiration_date field
 
     class Meta:
         model = User
-        # Exclude 'password' from the response and include necessary fields
-        fields = ['id', 'firstname', 'lastname', 'email', 'number', 'is_member']
+        # Include 'expiration_date' in the fields list
+        fields = ['id', 'firstname', 'lastname', 'email', 'number', 'is_member', 'expiration_date']
         extra_kwargs = {
             'password': {'write_only': True}  # Ensure password is write-only
         }
@@ -40,6 +40,16 @@ class UserSerializer(serializers.ModelSerializer):
         except PremiumMembership.DoesNotExist:
             return False
 
+    def get_expiration_date(self, obj):
+        """
+        Retrieves the expiration date from the PremiumMembership model.
+        Returns None if the PremiumMembership does not exist.
+        """
+        try:
+            return obj.premiummembership.expiration_date
+        except PremiumMembership.DoesNotExist:
+            return None
+
     def create(self, validated_data):
         """
         Handles user creation by setting the password correctly.
@@ -50,7 +60,6 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
-
 class ProductSerializer(serializers.ModelSerializer):
 
     user_firstname = serializers.SerializerMethodField()

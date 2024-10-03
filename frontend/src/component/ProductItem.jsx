@@ -2,6 +2,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Comment from "./Comment";
+// import { Time } from "../util/Time";
+// import GetTime from "./GetTime";
 
 const ProductItem = ({ product }) => {
   // console.log(product.id);
@@ -20,13 +22,17 @@ const ProductItem = ({ product }) => {
 
           <div className='flex flex-col w-[70%]'>
             <p className='mt-2 text-xl'>{product.name}</p>
-            <p className='mt-2 text-gray-600 text-sm'>{product.description}</p>
+            <p className={`mt-2 text-gray-600 text-sm`}>
+              {product.description}
+            </p>
             <p className='pt-2 pr-2 text-gray-500 text-xs'>
               {product.category}
             </p>
             <div className='flex justify-between mt-auto'>
               <p className='pb-1 text-slate-500'>Rs.{product.price}</p>
-              <p className='pr-2 pb-1 text-slate-500 text-xs'>2 hours ago</p>
+              <p className='pr-2 pb-1 text-slate-500 text-xs'>
+                {product.uploaded_at.split("T")[0]}
+              </p>
             </div>
           </div>
         </div>

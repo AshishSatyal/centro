@@ -59,6 +59,7 @@ class Product(models.Model):
     userName = models.ForeignKey(User, on_delete=models.CASCADE)
     location = models.CharField(max_length=255)
     category = models.CharField(max_length=255)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def reduce_stock(self, quantity):
         if quantity > self.countInStock:

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Link, redirect, useNavigate } from "react-router-dom"; // useNavigate instead of redirect
 import useAxios from "../util/axios";
+import { useUser } from "../context/UserContext";
 
 const HeaderBelow = () => {
+  const { userDetail } = useUser();
   const [url, setUrl] = useState("");
   const axiosInstance = useAxios();
   const navigate = useNavigate();
@@ -36,7 +38,7 @@ const HeaderBelow = () => {
         onClick={handleMembership}
         className='border-2 hover:border-gray-400 py-1 border-black rounded-xl md:w-36 h-10 font-regular text-black text-center text-sm md:text-xl'
       >
-        Go Premium
+        {userDetail?.is_member ? "Activated" : "Go Premium"}
       </button>
     </div>
   );

@@ -1,10 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { useUser } from "../context/UserContext";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+import useAxios from "../util/axios";
+import { useAuth } from "../context/AuthContext";
 
 const ProfilePage = () => {
+  // const { logout } = useAuth();
+  const axiosInstance = useAxios();
+  const navigate = useNavigate();
   const { userDetail } = useUser();
   console.log("user detail", userDetail);
+
+  const handleClick = async () => {
+    try {
+      const response = await axiosInstance.delete(
+        `/centroApp/userAccountDelete/`
+      );
+      console.log("response", response.status);
+      if (response.ok) {
+        // logout();
+        navigate("/login");
+        toast.success("Product Deleted Succesfully");
+      }
+    } catch (err) {
+      console.log("error:", err);
+    }
+  };
 
   return (
     <div className='flex justify-center items-center bg-gray-100 p-6 min-h-screen'>
@@ -29,9 +54,9 @@ const ProfilePage = () => {
               />
               <div>
                 <h4 className='font-semibold text-gray-800 text-lg'>
-                  Maksudur Rahman
+                  {userDetail?.firstname} {userDetail?.lastname}
                 </h4>
-                <p className='text-gray-600'>+880 1924699597</p>
+                <p className='text-gray-600'>{userDetail.number}</p>
                 <button className='bg-blue-500 hover:bg-blue-600 mt-2 px-4 py-2 rounded-md text-white'>
                   Edit
                 </button>
@@ -56,16 +81,7 @@ const ProfilePage = () => {
             <h3 className='mb-4 font-semibold text-gray-800 text-xl'>Emails</h3>
             <div className='text-gray-600'>
               <p className='font-semibold'>Primary</p>
-              <p>maksud.design7@gmail.com</p>
-              <p>tamannamr7@gmail.com</p>
-              <div className='mt-4'>
-                <button className='bg-green-500 hover:bg-green-600 px-4 py-2 rounded-md text-white'>
-                  See all emails (4)
-                </button>
-                <button className='bg-gray-300 hover:bg-gray-400 ml-2 px-4 py-2 rounded-md text-gray-700'>
-                  Add Email
-                </button>
-              </div>
+              <p>{userDetail.email}</p>
             </div>
           </div>
 
@@ -76,8 +92,7 @@ const ProfilePage = () => {
             </h3>
             <div className='text-gray-600'>
               <p className='font-semibold'>Primary</p>
-              <p>+880 1924699597</p>
-              <p>+880 1737841820</p>
+              <p>{userDetail.number}</p>
             </div>
           </div>
 
@@ -88,26 +103,32 @@ const ProfilePage = () => {
             </h3>
             <div className='text-gray-600'>
               <p>
-                <span className='font-semibold'>Language:</span> Bangla
+                <span className='font-semibold'>Language:</span> English
               </p>
               <p>
-                <span className='font-semibold'>Time zone:</span> (GMT+6) Time
-                in Bangladesh
+                <span className='font-semibold'>Nationality:</span> Nepalese
               </p>
-              <p>
-                <span className='font-semibold'>Nationality:</span> Bangladeshi
-              </p>
-              <p>
-                <span className='font-semibold'>Merchant ID:</span>{" "}
-                XYZ20150403095
-              </p>
-              <button className='bg-red-500 hover:bg-red-600 mt-4 px-4 py-2 rounded-md text-white'>
+              <button
+                onClick={() => handleClick()}
+                className='bg-red-500 hover:bg-red-600 mt-4 px-4 py-2 rounded-md text-white'
+              >
                 Close your account
               </button>
             </div>
           </div>
         </div>
       </div>
+      <ToastContainer
+        position='top-right'
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

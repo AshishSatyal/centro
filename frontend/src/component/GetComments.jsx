@@ -20,14 +20,14 @@ const GetComments = ({ id }) => {
     };
     fetchComments();
   }, [id]); // Add id as a dependency to refetch when it changes
-
+  console.log(comments);
   const commentEl = comments?.map((comment) => (
     <div
       key={comment.id}
       className='border-gray-200 bg-white shadow-md mb-4 p-4 border rounded-lg w-[20rem]'
     >
       <p className='mb-2 text-gray-700 text-lg'>{comment.comment_text}</p>
-      <p className='text-gray-500 text-sm'>By: {comment.user}</p>
+      <p className='text-gray-500 text-sm'>By: {comment.user_full_name}</p>
     </div>
   ));
 

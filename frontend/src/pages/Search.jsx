@@ -45,7 +45,7 @@ const SearchResults = () => {
             <ProductItem key={item.id} product={item} />
           ))}
         </div>
-        <div className='border border-red-400 w-[40%]'>
+        <div className='border w-[40%]'>
           <Trending />
         </div>
       </div>
