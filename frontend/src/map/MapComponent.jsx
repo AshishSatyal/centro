@@ -1,6 +1,5 @@
-// src/MapComponent.js
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import Modal from "./Modal"; // Import the Modal component
 
@@ -42,8 +41,21 @@ const MapComponent = () => {
     getLocation();
   }, []);
 
+  // Custom hook to set map view when position changes
+  const MapViewSetter = ({ position }) => {
+    const map = useMap();
+
+    useEffect(() => {
+      if (position) {
+        map.setView(position, 13); // Adjust zoom level as needed
+      }
+    }, [map, position]);
+
+    return null;
+  };
+
   return (
-    <div className='w-full h-[20rem]'>
+    <div className='relative z-0 w-full h-[20rem]'>
       <button
         onClick={() => setIsModalOpen(true)}
         className='bg-green-500 hover:bg-green-600 mb-4 px-4 py-2 rounded text-white'
@@ -52,9 +64,15 @@ const MapComponent = () => {
       </button>
 
       <MapContainer
-        center={position || [51.505, -0.09]}
+        center={position}
+        className='z-0 absolute'
         zoom={13}
         style={{ height: "100vh", width: "100%" }}
+        whenCreated={(mapInstance) => {
+          if (position) {
+            mapInstance.setView(position, 13);
+          }
+        }}
       >
         <TileLayer
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
@@ -65,6 +83,7 @@ const MapComponent = () => {
             <Popup>Your current location</Popup>
           </Marker>
         )}
+        <MapViewSetter position={position} />
       </MapContainer>
 
       <Modal

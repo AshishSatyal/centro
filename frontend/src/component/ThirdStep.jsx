@@ -34,14 +34,16 @@ const ThirdStep = ({ values, handleChange }) => {
           className='border rounded-xl w-full h-16'
         ></textarea>
       </div>
-      <button
-        className='border-2 p-2 border-black rounded-xl text-black'
-        onClick={() => toggleMap()}
-      >
-        Current Location
-      </button>
+      <div className='w-full'>
+        <button
+          className='border-2 p-2 border-black rounded-xl text-black'
+          onClick={() => toggleMap()}
+        >
+          Current Location
+        </button>
 
-      {toggle ? <MapComponent /> : ""}
+        {toggle ? <MapComponent /> : ""}
+      </div>
     </div>
   );
 };

@@ -453,12 +453,12 @@ class PurchasePremiumMembershipView(APIView):
         user = request.user
         subPaisa = 20000
         pxid = str(uuid.uuid4())
-        return_url = "premium/membership/success/"
+        return_url = "Payment-validate/"
         # Khalti payment initiation logic
         url = "https://a.khalti.com/api/v2/epayment/initiate/"
 
         payload = json.dumps({
-            "return_url": "http://127.0.0.1:8000/"+return_url,
+            "return_url": "http://localhost:5173/"+return_url,
             "website_url": "http://127.0.0.0:8000",
             "amount": subPaisa,
             "purchase_order_id": pxid,
@@ -475,7 +475,7 @@ class PurchasePremiumMembershipView(APIView):
 }
         response = requests.post(url, headers=headers, data=payload)
         new_res = json.loads(response.text)
-
+        print(new_res)
         if response.status_code == 200:
             # Create or update the premium membership
             membership, created = PremiumMembership.objects.get_or_create(user=user)
