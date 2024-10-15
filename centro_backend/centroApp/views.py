@@ -105,13 +105,13 @@ class ProductView(APIView):
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def get(self,request):
-        products = Product.objects.all()
+        products = Product.objects.all(sold=False)
         serializer = ProductSerializer(products,many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 #Delete,Update and view individual product
 class IndividualProductView(APIView):
@@ -195,7 +195,7 @@ class RequestPasswordReset(generics.GenericAPIView):
                 reset_url = f"{settings.PASSWORD_RESET_BASE_URL}?{token}"
                 subject = "Reset Password"
                 html_content = render_to_string('forgetpass_email.html', {
-                    'fname': "Aayush", 'lname': "Tim", 'email': email, 'code': reset_url})
+                    'fname': user.firstname, 'lname': user.lastname, 'email': email, 'code': reset_url})
                 from_email = 'xayush.tc@gmail.com'
                 to = [email]
 
@@ -569,7 +569,8 @@ class TrendingProductView(APIView):
 
         # Filter products added by users with an active premium membership
         trending_products = Product.objects.filter(
-            userName__in=active_premium_users
+            userName__in=active_premium_users,
+            sold=False
         ).order_by('?')[:10]
 
         # Serialize the trending products
@@ -612,3 +613,139 @@ class DeleteAccountView(APIView):
         user.delete()
 
         return Response({"message": "Your account has been successfully deleted."}, status=status.HTTP_200_OK)
+    
+class PurchaseProductView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        product_id = request.data.get('product_id')
+
+        if not product_id:
+            return Response({'error': 'Product ID is required'}, status=400)
+
+        subPaisa = 100000
+        pxid = str(uuid.uuid4())
+        return_url = "Payment-validate/"
+
+        # Get the product being purchased
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found'}, status=404)
+        
+        price = product.price * 100 if product.price * 100 <= 100000 else 100000
+        print(price)
+
+        # Khalti payment initiation logic
+        url = "https://a.khalti.com/api/v2/epayment/initiate/"
+
+        payload = json.dumps({
+            "return_url": "http://localhost:5173/" + return_url,
+            "website_url": "http://127.0.0.0:8000",
+            "amount": price,
+            "purchase_order_id": pxid,
+            "purchase_order_name": product.name,
+            "customer_info": {
+                "name": user.firstname,
+                "email": user.email,
+                "phone": "9800000001"
+            }
+        })
+        headers = {
+            'Authorization': 'key 07b52c0f30dc425ea9c53fd77e798e9d',
+            'Content-Type': 'application/json',
+        }
+        response = requests.post(url, headers=headers, data=payload)
+        new_res = json.loads(response.text)
+
+        print(new_res)
+        
+        if response.status_code == 200:
+            print("Payment URL:", new_res['payment_url'])
+            return Response({'payment_url': new_res['payment_url']}, status=200)
+        else:
+            return Response({'error': 'Payment initiation failed'}, status=response.status_code)
+
+class ValidatePaymentView(APIView):
+    def get(self, request, pidx, status):
+        user = request.user
+        
+        url = "https://a.khalti.com/api/v2/epayment/lookup/"
+    
+        headers = {
+            'Authorization': 'key 07b52c0f30dc425ea9c53fd77e798e9d',
+            'Content-Type': 'application/json',
+        }
+        
+        payload = json.dumps({
+            "pidx": pidx
+        })
+        
+        response = requests.request("POST", url, headers=headers, data=payload)
+
+        new_res = json.loads(response.text)
+        print(new_res)
+
+        if status == "Completed" and new_res.get('status') == 'Completed':
+            product_id = request.GET.get('product_id')
+            quantity = int(request.GET.get('quantity', 1))
+
+            midpoint = request.GET.get('midpoint')
+
+            try:
+                product = Product.objects.get(id=product_id)
+            except Product.DoesNotExist:
+                return Response({'error': 'Product not found'}, status=404)
+            
+            if product.countInStock < quantity:
+                return Response({'error': 'Not enough stock available'}, status=400)
+
+            total_price = product.price * quantity
+
+            transaction = Transaction.objects.create(
+                user=user,
+                product=product,
+                quantity=quantity,
+                total_price=total_price
+            )
+
+            # Update product stock
+            product.reduce_stock(quantity)
+
+            # Send email to buyer
+            self.send_email(user.email, user.firstname, user.lastname, product.name, 
+                            midpoint)
+
+            # Send email to seller
+            seller_email = product.userName.email
+            self.send_email(seller_email, product.userName.firstname, product.userName.lastname, product.name, 
+                            midpoint)
+
+
+            return Response({'status': 'Payment successful. Transaction recorded!'}, status=200)
+        else:
+            return Response({'error': 'Payment not completed.'}, status=400)
+        
+    def send_email(self, recipient_email, first_name, last_name, product_name, midpoint):
+            subject = "Payment Successful | Meeting Point"
+            html_content = render_to_string('payment_success.html', {
+                'fname': first_name,
+                'lname': last_name,
+                'email': recipient_email,
+                'product_name': product_name,
+                'midpoint': midpoint
+            })
+            
+            from_email = 'xayush.tc@gmail.com'
+            to = [recipient_email]
+
+            text_content = strip_tags(html_content)
+            email_message = EmailMultiAlternatives(
+                subject,
+                text_content,
+                from_email,
+                to,
+            )
+            email_message.attach_alternative(html_content, "text/html")
+            email_message.send(fail_silently=False)
