@@ -1,9 +1,10 @@
 from django.urls import path
-from .views import PremiumMembershipSuccessView, PurchasePremiumMembershipView, PurchaseView, RegisterView, LoginView, SavedItemView, TransactionHistoryView, TrendingProductView, UserView,\
+from .views import PremiumMembershipSuccessView, PurchasePremiumMembershipView,\
+      PurchaseProductView, PurchaseView, RegisterView, LoginView, SavedItemView, TransactionHistoryView, TrendingProductView, UserView,\
       LogoutView,ProductView,IndividualProductView,SearchProductView,\
         RequestPasswordReset,ResetPassword,SimilarityAPIView,MidpointView\
         ,CommentListCreateView,UserProductListView,UserProductDeleteView\
-        ,DeleteAccountView,SavedItemDeleteView
+        ,DeleteAccountView,SavedItemDeleteView, ValidatePaymentView
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -39,6 +40,9 @@ urlpatterns = [
 
     path('premium/membership/purchase/', PurchasePremiumMembershipView.as_view(), name='purchase_premium_membership'),
     path('premium/membership/success/<str:pidx>/<str:status>/', PremiumMembershipSuccessView.as_view(), name='membership_success'),
+
+    path('purchase-product/', PurchaseProductView.as_view(), name='purchase-product'),
+    path('validate-payment/<str:pidx>/<str:status>/', ValidatePaymentView.as_view(), name='validate-payment'),
     
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

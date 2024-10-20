@@ -66,6 +66,10 @@ class Product(models.Model):
         if quantity > self.countInStock:
             raise ValueError("Not enough stock available")
         self.countInStock -= quantity
+
+        if self.countInStock == 0:
+            self.sold = True
+
         self.save()
 
     def __str__(self):
