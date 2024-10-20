@@ -2,12 +2,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Comment from "./Comment";
-// import { Time } from "../util/Time";
-// import GetTime from "./GetTime";
 
 const ProductItem = ({ product }) => {
   // console.log(product.id);
   const _id = product.id ?? product.product_id;
+
   return (
     <Link to={`/product/${_id}`}>
       <div className='relative hover:shadow border border-black rounded-lg w-[35rem] h-52 transition-all'>
@@ -31,8 +30,11 @@ const ProductItem = ({ product }) => {
             <div className='flex justify-between mt-auto'>
               <p className='pb-1 text-slate-500'>Rs.{product.price}</p>
               <p className='pr-2 pb-1 text-slate-500 text-xs'>
-                {product.uploaded_at.split("T")[0]}
+                {(product?.uploaded_at || product?.saved_at)?.split("T")[0]}
               </p>
+              {/* <p className='pr-2 pb-1 text-slate-500 text-xs'>
+                {product?.saved_at.split("T")[0]}
+              </p> */}
             </div>
           </div>
         </div>

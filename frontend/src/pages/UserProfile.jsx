@@ -1,35 +1,51 @@
-import React from "react";
-
+import React, { useEffect } from "react";
 import { useUser } from "../context/UserContext";
-import { toast } from "react-toastify";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 import useAxios from "../util/axios";
-import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
-  // const { logout } = useAuth();
   const axiosInstance = useAxios();
   const navigate = useNavigate();
   const { userDetail } = useUser();
-  console.log("user detail", userDetail);
+  const [locationName, setLocationName] = React.useState("");
 
   const handleClick = async () => {
     try {
       const response = await axiosInstance.delete(
         `/centroApp/userAccountDelete/`
       );
-      console.log("response", response.status);
-      if (response.ok) {
-        // logout();
+      if (response.status === 200) {
         navigate("/login");
-        toast.success("Product Deleted Succesfully");
+        toast.success("Account deleted successfully!");
       }
     } catch (err) {
-      console.log("error:", err);
+      console.error("Error deleting account:", err);
+      toast.error("Failed to delete account.");
     }
   };
+
+  const fetchLocationName = async (latitude, longitude) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setLocationName(data.display_name || "Location not found");
+    } catch (error) {
+      console.error("Error fetching location name:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (userDetail?.location) {
+      const { latitude, longitude } = userDetail.location;
+      fetchLocationName(latitude, longitude);
+    }
+  }, [userDetail]);
 
   return (
     <div className='flex justify-center items-center bg-gray-100 p-6 min-h-screen'>
@@ -47,19 +63,16 @@ const ProfilePage = () => {
               Profile
             </h3>
             <div className='flex items-center'>
-              <img
+              {/* <img
                 src='https://via.placeholder.com/60'
                 alt='Profile'
                 className='mr-4 border rounded-full w-16 h-16'
-              />
+              /> */}
               <div>
                 <h4 className='font-semibold text-gray-800 text-lg'>
                   {userDetail?.firstname} {userDetail?.lastname}
                 </h4>
-                <p className='text-gray-600'>{userDetail.number}</p>
-                <button className='bg-blue-500 hover:bg-blue-600 mt-2 px-4 py-2 rounded-md text-white'>
-                  Edit
-                </button>
+                {/* <p className='text-gray-600'>{userDetail.number}</p> */}
               </div>
             </div>
           </div>
@@ -71,8 +84,7 @@ const ProfilePage = () => {
             </h3>
             <div className='text-gray-600'>
               <p className='font-semibold'>Primary</p>
-              <p>119 North Jatrabair, Dhaka 1294, Bangladesh</p>
-              <p>420 Fariada Palace, Pallibiddut Road, Patuakhali</p>
+              <p>{locationName}</p>
             </div>
           </div>
 
@@ -109,7 +121,7 @@ const ProfilePage = () => {
                 <span className='font-semibold'>Nationality:</span> Nepalese
               </p>
               <button
-                onClick={() => handleClick()}
+                onClick={handleClick}
                 className='bg-red-500 hover:bg-red-600 mt-4 px-4 py-2 rounded-md text-white'
               >
                 Close your account

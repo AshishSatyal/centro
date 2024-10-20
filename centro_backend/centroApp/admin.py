@@ -5,7 +5,7 @@ from .models import User,Product,PasswordReset,UserLocation,Comment,Transaction,
 
 class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
-    list_display = ('email', 'firstname','lastname', 'is_staff', 'is_superuser')
+    list_display = ('email', 'firstname','lastname','number', 'is_staff', 'is_superuser')
     list_filter = ('is_staff', 'is_superuser')
     fieldsets = (
         (None, {'fields': ('email', 'password')}),

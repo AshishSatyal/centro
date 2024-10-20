@@ -47,6 +47,7 @@ class User(AbstractUser):
 
     def get_full_name(self):
         return f"{self.firstname} {self.lastname}"
+    AUTH_USER_MODEL = 'centroApp.User'
 
 class Product(models.Model):
     name = models.CharField(max_length=255)

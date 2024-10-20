@@ -77,7 +77,7 @@ const ProductPage = () => {
       <div className='w-fit'>
         <p className='border-b text-lg capitalize'>Similar Products</p>
       </div>
-      {/* <Similar /> */}
+      <Similar />
     </div>
   );
 };

@@ -5,7 +5,7 @@ import { MdDelete } from "react-icons/md";
 // import { toast } from "react-toastify";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Assuming you're using react-toastify for success notifications
+import "react-toastify/dist/ReactToastify.css";
 
 const Saved = () => {
   const [saved, setSaved] = useState([]);

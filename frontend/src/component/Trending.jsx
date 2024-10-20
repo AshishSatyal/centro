@@ -28,7 +28,7 @@ const Trending = () => {
               />
             </div>
             <div className='w-[40%]'>
-              <p className='text-xl'>{product.name}</p>
+              <p className='text-lg'>{product.name}</p>
               {/* <p className='my-2 text-xl'>{product.description}</p> */}
               <p className='my-2 font-semi text-slate-500'>
                 Rs.{product.price}

@@ -309,7 +309,8 @@ class SimilarityAPIView(APIView):
                     "image": product.image.url if product.image else None,
                     "condition": product.condition,
                     "category": product.category,
-                    "similarity_score": similarity_score
+                    "similarity_score": similarity_score,
+                    "uploaded_at": product.uploaded_at
                 }
                 similar_products.append(product_data)
 
