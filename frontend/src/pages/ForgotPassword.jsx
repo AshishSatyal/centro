@@ -29,6 +29,7 @@ const ForgotPassword = () => {
       );
 
       const result = await response.json();
+      console.log(result);
 
       if (response.status === 200) {
         toast.success("Code sent to your email");
@@ -36,7 +37,7 @@ const ForgotPassword = () => {
 
       if (!response.ok) {
         // If the response status is not ok, throw an error with the message from the backend
-        toast.warning("code not sent");
+        toast.warn(result.error);
       }
 
       // Handle the successful response here
