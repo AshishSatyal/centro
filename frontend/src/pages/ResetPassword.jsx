@@ -14,8 +14,8 @@ const ResetPassword = () => {
   } = useForm();
 
   // Extract token from URL using URLSearchParams
-  const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get("token");
+  const url = window.location.href();
+  const token = url.split("?").pop();
   console.log(token);
 
   const obj = {
