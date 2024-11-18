@@ -61,10 +61,10 @@ const Header = () => {
             </button>
           ) : (
             <Link
-              to='/signup'
+              to='/login'
               className='border-2 hover:border-white py-2 rounded-xl w-24 md:w-36 h-12 text-center text-sm text-white md:text-xl transition-all'
             >
-              Sign Up
+              Sign in
             </Link>
           )}
           <Link to={"/profile"}>
