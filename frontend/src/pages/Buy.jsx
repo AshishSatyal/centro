@@ -2,20 +2,23 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import tileLayer from "../util/tileLayer";
 import useAxios from "../util/axios";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { redirect, useParams } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import ProductItem from "../component/ProductItem";
-
+import { locationNameAtom } from "./@state/state";
+import { useAtom } from "jotai";
 const MapWrapper = () => {
   const center = [27.7159446, 85.329119];
   const { id } = useParams();
   const axiosInstance = useAxios();
   const { userDetail } = useUser();
 
-  const [mid, setMid] = useState({});
-  const [locationName, setLocationName] = useState("");
-  const [product, setProduct] = useState({}); // Changed to an object
+  const [locationName, setLocationName] = useAtom(locationNameAtom);
 
+  const [mid, setMid] = useState({});
+  // const [locationName, setLocationName] = useState("");
+  const [product, setProduct] = useState({}); // Changed to an object
+  const [url, setUrl] = useState("");
   useEffect(() => {
     const getMid = async () => {
       if (userDetail && userDetail.location) {
@@ -54,6 +57,7 @@ const MapWrapper = () => {
           throw new Error("Network response was not ok");
         }
         const data = await response.json();
+
         setLocationName(data.display_name || "Location not found");
       } catch (error) {
         console.error("Error fetching location name:", error);
@@ -75,14 +79,32 @@ const MapWrapper = () => {
     getProduct();
   }, [id]); // Ensure this fetches on id change
 
-  const initiateBuy = () => {
-    useEffect(() => {
-      const response = axiosInstance.post("/centroApp/purchase-product/", {
-        product_id: id,
-      });
-      console.log(response, "clicking");
-    }, []);
+  const initiateBuy = async () => {
+    try {
+      const response = await axiosInstance.post(
+        "/centroApp/purchase-product/",
+        {
+          product_id: id,
+        }
+      );
+
+      if (response.status === 200) {
+        const paymentUrl = response.data?.payment_url;
+        if (paymentUrl) {
+          // Ensure locationName is set before redirecting
+          const currentLocationName = locationName;
+          setLocationName(currentLocationName); // Ensure it's up-to-date
+
+          window.location.href = paymentUrl; // Redirect directly to the payment URL
+        } else {
+          console.error("Payment URL not found.");
+        }
+      }
+    } catch (err) {
+      console.log("Error during purchase:", err);
+    }
   };
+
   const points = [
     {
       lat: mid.user_latitude || 0,
@@ -118,7 +140,7 @@ const MapWrapper = () => {
             Go Back
           </button>
           <button
-            onClick={initiateBuy()}
+            onClick={initiateBuy}
             className='bg-black border rounded-xl w-full h-12 text-white'
           >
             Buy

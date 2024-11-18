@@ -1,12 +1,13 @@
 import React from "react";
+import { Input } from "antd";
 
 const FIrstStep = ({ values, handleChange, handleImageUpload }) => {
   return (
     <div className='flex flex-col justify-center items-start gap-2'>
       <div className='flex flex-col gap-1 w-full'>
         <label htmlFor='title'>Title of a product</label>
-        <input
-          type='text'
+
+        <Input
           name='name'
           value={values.name}
           id='name'
@@ -17,7 +18,7 @@ const FIrstStep = ({ values, handleChange, handleImageUpload }) => {
       </div>
       <div className='flex flex-col gap-1 w-full'>
         <label htmlFor='price'>Price of a product</label>
-        <input
+        <Input
           className='px-2 border rounded-xl w-full h-10'
           type='number'
           name='price'

@@ -22,7 +22,7 @@ const Similar = () => {
   }, [id]);
 
   const similarElements = similarProducts?.map((item) => {
-    console.log(item);
+    // console.log(item);
     return <ProductItem key={item?.product_id} product={item} />; // Adding key prop
   });
 

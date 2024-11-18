@@ -19,30 +19,42 @@ import PaymentValidate from "./pages/PaymentValidate.jsx";
 import { UserProvider } from "./context/UserContext.jsx";
 import Buy from "./pages/Buy.jsx";
 import Category from "./pages/Category.jsx";
+import PaymentBuyValidate from "./pages/PaymentBuyValidate.jsx";
+import { Provider } from "jotai";
+import { locationNameStore } from "./pages/@state/state.js";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Router>
       <AuthProvider>
         <UserProvider>
-          <Routes>
-            <Route path='/signup' element={<Signup />} />
-            <Route path='/login' element={<Login />} />
-            <Route path='/forgotpassword' element={<ForgotPassword />} />
-            <Route path={`/reset-password`} element={<ResetPassword />} />
-            <Route path={`/Payment-validate/`} element={<PaymentValidate />} />
-            <Route path={`/map-location/:id`} element={<Buy />} />
-            <Route path={`/product`} element={<Product />} />
-            <Route path='' element={<Layout />}>
-              <Route path='/' element={<App />} />
-              <Route path='/profile' element={<ProfilePage />} />
-              <Route path={`/add-product`} element={<AddProduct />} />
-              <Route path={`/product/:id`} element={<ProductPage />} />
-              <Route path={`/category/:category`} element={<Category />} />
-              <Route path='/search/:query' element={<Search />} />
-              <Route path='/saved-product' element={<Saved />} />
-            </Route>
-          </Routes>
+          <Provider store={locationNameStore}>
+            <Routes>
+              <Route path='/signup' element={<Signup />} />
+              <Route path='/login' element={<Login />} />
+              <Route path='/forgotpassword' element={<ForgotPassword />} />
+              <Route path={`/reset-password`} element={<ResetPassword />} />
+              <Route
+                path={`/Payment-validate/`}
+                element={<PaymentValidate />}
+              />
+              <Route
+                path={`/Payment-buy-validate/`}
+                element={<PaymentBuyValidate />}
+              />
+              <Route path={`/map-location/:id`} element={<Buy />} />
+              <Route path={`/product`} element={<Product />} />
+              <Route path='' element={<Layout />}>
+                <Route path='/' element={<App />} />
+                <Route path='/profile' element={<ProfilePage />} />
+                <Route path={`/add-product`} element={<AddProduct />} />
+                <Route path={`/product/:id`} element={<ProductPage />} />
+                <Route path={`/category/:category`} element={<Category />} />
+                <Route path='/search/:query' element={<Search />} />
+                <Route path='/saved-product' element={<Saved />} />
+              </Route>
+            </Routes>
+          </Provider>
         </UserProvider>
       </AuthProvider>
     </Router>

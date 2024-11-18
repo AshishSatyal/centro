@@ -109,7 +109,7 @@ class ProductView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def get(self,request):
-        products = Product.objects.all(sold=False)
+        products = Product.objects.filter(sold=False)
         serializer = ProductSerializer(products,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -627,7 +627,7 @@ class PurchaseProductView(APIView):
 
         subPaisa = 100000
         pxid = str(uuid.uuid4())
-        return_url = "Payment-validate/"
+        return_url = "Payment-buy-validate/"
 
         # Get the product being purchased
         try:

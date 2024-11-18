@@ -148,3 +148,14 @@ PASSWORD_RESET_BASE_URL = os.getenv('PASSWORD_RESET_BASE_URL', 'http://localhost
 
 # SMTP Configuration
 
+EMAIL_HOST ='smtp-relay.brevo.com'
+
+EMAIL_PORT =587
+
+EMAIL_USE_TLS =True
+
+EMAIL_HOST_USER ='xayush.tc@gmail.com'
+
+EMAIL_HOST_PASSWORD ='fnXO2zsLFkTj3Kmr'
+
+DEFAULT_FROM_EMAIL ='xayush.tc@gmail.com'
