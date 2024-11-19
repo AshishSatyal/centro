@@ -39,7 +39,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                 element={<PaymentValidate />}
               />
               <Route
-                path={`/Payment-buy-validate/`}
+                path={`/Payment-buy-validate/:id/:midpoint`}
                 element={<PaymentBuyValidate />}
               />
               <Route path={`/map-location/:id`} element={<Buy />} />

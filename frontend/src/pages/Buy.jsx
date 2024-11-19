@@ -2,18 +2,22 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import tileLayer from "../util/tileLayer";
 import useAxios from "../util/axios";
 import { useEffect, useState } from "react";
-import { redirect, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import ProductItem from "../component/ProductItem";
 import { locationNameAtom } from "./@state/state";
 import { useAtom } from "jotai";
 const MapWrapper = () => {
   const center = [27.7159446, 85.329119];
+  const navigate = useNavigate();
   const { id } = useParams();
   const axiosInstance = useAxios();
   const { userDetail } = useUser();
 
   const [locationName, setLocationName] = useAtom(locationNameAtom);
+  const midlocation = locationName.split(",").slice(0, 4).join(",");
+
+  console.log(midlocation);
 
   const [mid, setMid] = useState({});
   // const [locationName, setLocationName] = useState("");
@@ -85,6 +89,7 @@ const MapWrapper = () => {
         "/centroApp/purchase-product/",
         {
           product_id: id,
+          midpoint: midlocation,
         }
       );
 
@@ -104,7 +109,7 @@ const MapWrapper = () => {
       console.log("Error during purchase:", err);
     }
   };
-
+  const handleNavigate = () => {};
   const points = [
     {
       lat: mid.user_latitude || 0,
@@ -136,7 +141,12 @@ const MapWrapper = () => {
           {locationName || "Loading..."}
         </p>
         <div className='flex justify-between items-center mt-5'>
-          <button className='bg-black border rounded-xl w-full h-12 text-white'>
+          <button
+            onClick={() => {
+              navigate(`/product/${id}`);
+            }}
+            className='bg-black border rounded-xl w-full h-12 text-white'
+          >
             Go Back
           </button>
           <button

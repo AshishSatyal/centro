@@ -33,6 +33,9 @@ const ForgotPassword = () => {
 
       if (response.status === 200) {
         toast.success("Code sent to your email");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
       }
 
       if (!response.ok) {

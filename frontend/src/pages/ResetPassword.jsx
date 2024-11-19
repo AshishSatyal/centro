@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const ResetPassword = () => {
+  const [clicked, setClicked] = useState(false);
   const navigate = useNavigate();
   const {
     register,
@@ -14,7 +15,7 @@ const ResetPassword = () => {
   } = useForm();
 
   // Extract token from URL using URLSearchParams
-  const url = window.location.href();
+  const url = window.location.href;
   const token = url.split("?").pop();
   console.log(token);
 
@@ -48,6 +49,7 @@ const ResetPassword = () => {
       const responseBody = await response.json(); // Ensure you parse the response
 
       if (response.status === 200) {
+        setClicked((click) => !click);
         toast.success(responseBody.message || "Password reset successful");
         setTimeout(() => {
           navigate("/login");
@@ -64,7 +66,7 @@ const ResetPassword = () => {
   return (
     <div className='flex flex-col justify-center items-center w-full h-[100vh]'>
       <h1 className='font-semibold text-4xl capitalize'>Reset Password</h1>
-      <div className='my-2 px-10 rounded-xl boxShadow'>
+      <div className='my-2 px-10 rounded-xl w-5/12 boxShadow'>
         <form className='my-8' onSubmit={handleSubmit(onSubmit)}>
           <div className='flex flex-col justify-center items-center gap-3 h-full'>
             <div className='flex flex-col gap-2'>
@@ -77,7 +79,7 @@ const ResetPassword = () => {
                     message: "Password must be at least 6 characters long",
                   },
                 })}
-                className='focus:border-gray-800 px-2 border border-black rounded-xl w-[15rem] h-10'
+                className='focus:border-gray-800 px-2 border border-black rounded-xl w-[25rem] h-10'
                 type='password'
                 name='new_password'
                 id='new_password'
@@ -93,7 +95,7 @@ const ResetPassword = () => {
                 {...register("confirm_password", {
                   required: "Please confirm your password",
                 })}
-                className='focus:border-gray-800 px-2 border border-black rounded-xl w-[15rem] h-10'
+                className='focus:border-gray-800 px-2 border border-black rounded-xl w-[25rem] h-10'
                 type='password'
                 name='confirm_password'
                 id='confirm_password'
@@ -105,10 +107,11 @@ const ResetPassword = () => {
                 </p>
               )}
             </div>
+
             <button
               type='submit'
               className='border border-black rounded-xl w-[15rem] h-10'
-              disabled={Object.keys(errors).length > 0} // Disable button if there are errors
+              disabled={clicked ? true : false} // Disable button if there are errors
             >
               Reset Password
             </button>

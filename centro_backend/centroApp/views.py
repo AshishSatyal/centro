@@ -33,6 +33,8 @@ import json
 from datetime import datetime, timedelta
 from django.utils import timezone
 from django.db.models import Q
+from urllib.parse import quote
+
 
 
 # Create your views here.
@@ -621,13 +623,19 @@ class PurchaseProductView(APIView):
     def post(self, request):
         user = request.user
         product_id = request.data.get('product_id')
+        midpoint = request.data.get('midpoint')
+        encoded_midpoint = quote(midpoint)
 
+        print(midpoint)
         if not product_id:
             return Response({'error': 'Product ID is required'}, status=400)
 
         subPaisa = 100000
         pxid = str(uuid.uuid4())
-        return_url = "Payment-buy-validate/"
+        # return_url = f"Payment-buy-validate/{product_id}/{midpoint}/"
+        return_url = f"Payment-buy-validate/{product_id}/{encoded_midpoint}"
+        # full_return_url = f"http://localhost:5173/{return_url}"
+        
 
         # Get the product being purchased
         try:
@@ -640,7 +648,7 @@ class PurchaseProductView(APIView):
 
         # Khalti payment initiation logic
         url = "https://a.khalti.com/api/v2/epayment/initiate/"
-
+        print(return_url)
         payload = json.dumps({
             "return_url": "http://localhost:5173/" + return_url,
             "website_url": "http://127.0.0.0:8000",
@@ -650,7 +658,7 @@ class PurchaseProductView(APIView):
             "customer_info": {
                 "name": user.firstname,
                 "email": user.email,
-                "phone": "9800000001"
+                "phone": "9800000001",
             }
         })
         headers = {

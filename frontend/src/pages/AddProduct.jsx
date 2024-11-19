@@ -13,8 +13,6 @@ import "react-toastify/dist/ReactToastify.css";
 const AddProduct = () => {
   const navigate = useNavigate();
   const { userDetail } = useUser();
-
-  // Use a fallback value for userName, defaulting to 0 if userDetail is not available
   const userId = userDetail?.id ? Number(userDetail.id) : 1;
 
   const [activeStep, setActiveStep] = useState(1);
@@ -32,7 +30,45 @@ const AddProduct = () => {
     countInStock: 3,
   });
 
+  const validateStep = () => {
+    switch (activeStep) {
+      case 1:
+        if (!formdata.name || !formdata.price || !formdata.description) {
+          toast.error("Please fill in all required fields in Step 1.");
+          return false;
+        }
+        break;
+      case 2:
+        if (!formdata.condition || !formdata.category || !formdata.usedFor) {
+          toast.error("Please fill in all required fields in Step 2.");
+          return false;
+        }
+        break;
+      case 3:
+        if (!formdata.location || !formdata.locationDescription) {
+          toast.error("Please fill in all required fields in Step 3.");
+          return false;
+        }
+        break;
+      default:
+        return true;
+    }
+    return true;
+  };
+
+  const handleNext = () => {
+    if (validateStep()) {
+      setActiveStep((prev) => prev + 1);
+    }
+  };
+
+  const handleBack = () => {
+    setActiveStep((prev) => (prev === 1 ? prev : prev - 1));
+  };
+
   const handleSubmit = async () => {
+    if (!validateStep()) return;
+
     const formData = new FormData();
     Object.keys(formdata).forEach((key) => {
       formData.append(key, formdata[key]);
@@ -50,7 +86,7 @@ const AddProduct = () => {
         }, 1000);
       }
     } catch (err) {
-      console.log(err);
+      toast.error("An error occurred while submitting the form.");
     }
   };
 
@@ -65,21 +101,17 @@ const AddProduct = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      handleChange({
-        target: {
-          name: "image",
-          value: file,
-        },
-      });
+      setFormData((prevValues) => ({
+        ...prevValues,
+        image: file,
+      }));
     }
   };
-  console.log(formdata);
 
   return (
     <CenterComponent>
       <div className='flex flex-col items-center my-5 mr-40'>
         <h1 className='my-5 font-serif text-3xl capitalize'>Add a product</h1>
-
         <div className='px-2 w-5/12'>
           <form
             className='px-4 border w-full'
@@ -109,10 +141,7 @@ const AddProduct = () => {
             <div className='flex justify-between my-5 w-full'>
               <button
                 className='bg-black rounded-xl w-24 h-10 text-white'
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActiveStep(activeStep === 1 ? activeStep : activeStep - 1);
-                }}
+                onClick={handleBack}
                 type='button'
               >
                 Back
@@ -128,10 +157,7 @@ const AddProduct = () => {
               ) : (
                 <button
                   className='bg-slate-200 rounded-xl w-24 h-10'
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setActiveStep(activeStep + 1);
-                  }}
+                  onClick={handleNext}
                   type='button'
                 >
                   Next
