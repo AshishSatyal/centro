@@ -6,6 +6,7 @@ import { MdDelete } from "react-icons/md";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Trending from "../component/Trending";
 
 const Saved = () => {
   const [saved, setSaved] = useState([]);
@@ -42,29 +43,34 @@ const Saved = () => {
   };
 
   return (
-    <div className='flex flex-col gap-5 border-x-2 p-10'>
-      <h1 className='text-2xl capitalize'>saved products</h1>
-      {saved?.map((item) => (
-        <div className='relative flex w-fit' key={item.id}>
-          <ProductItem product={item} />
-          <MdDelete
-            className='top-2 right-0 absolute text-xl cursor-pointer'
-            onClick={() => handleDelete(item.id)}
-          />
+    <>
+      <h1 className='mt-5 text-2xl capitalize'>saved products</h1>
+      <div className='flex justify-between items-start gap-5 border-x-2 mt-5 p-2'>
+        {saved?.map((item) => (
+          <div className='relative flex w-fit' key={item.id}>
+            <ProductItem product={item} />
+            <MdDelete
+              className='top-2 right-2 absolute text-xl cursor-pointer'
+              onClick={() => handleDelete(item.id)}
+            />
+          </div>
+        ))}
+        <ToastContainer
+          position='top-right'
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+        <div className='w-[40%]'>
+          <Trending />
         </div>
-      ))}
-      <ToastContainer
-        position='top-right'
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -71,14 +71,18 @@ const ProductPage = () => {
   );
 
   return (
-    <div className='flex-col mt-2'>
-      <div>{productEl}</div>
-      <Comment />
-      <div className='w-fit'>
-        <p className='border-b text-lg capitalize'>Similar Products</p>
+    <>
+      <div className='flex gap-4 mt-2'>
+        <div>{productEl}</div>
+        <Comment />
       </div>
-      <Similar />
-    </div>
+      <div className='my-10 w-fit'>
+        <p className='border-b font-semibold text-xl capitalize'>
+          Similar Products
+        </p>
+        <Similar />
+      </div>
+    </>
   );
 };
 

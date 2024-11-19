@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import HeaderBelow from "./HeaderBelow";
 import IconAvatars from "./ProfileAvatar";
-import { LuLogOut } from "react-icons/lu";
+import { LuLogOut, LuSearch } from "react-icons/lu";
 
 const Header = () => {
   const { authTokens, logout } = useAuth();
@@ -32,14 +32,14 @@ const Header = () => {
         >
           centro
         </Link>
-        <div>
+        <div className='relative'>
           <form onSubmit={handleSearch}>
             <input
               type='search'
               name='search'
               id='search'
               placeholder='search'
-              className='border-2 border-white hover:shadow p-2 rounded-xl w-96 placeholder:text-black capitalize'
+              className='border-2 border-white hover:shadow p-2 rounded-xl lg:w-[35rem] placeholder:text-black capitalize'
               onChange={(e) => setQuery(e.target.value)}
               value={query}
             />

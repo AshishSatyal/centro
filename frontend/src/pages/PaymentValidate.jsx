@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import useAxios from "../util/axios";
+import { toast, ToastContainer } from "react-toastify";
 
 const PaymentValidate = () => {
   const axiosInstance = useAxios();
@@ -14,9 +15,7 @@ const PaymentValidate = () => {
       );
       if (response.status === 200) {
         setMessage("Purchase Confirmed! You have premium feature for 1month");
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
+        toast.success("Membership Purchased!");
       }
     };
     validate();
@@ -31,8 +30,17 @@ const PaymentValidate = () => {
   const status = query.get("status");
   console.log(pidx, status);
   return (
-    <div className='flex justify-center items-center w-full h-[100vh]'>
-      <h1>{message}</h1>
+    <div className='flex flex-col justify-center items-center w-full h-[100vh]'>
+      <h1 className='text-xl'>{message}!</h1>
+      <button
+        className='border-4 hover:bg-black mt-4 p-2 rounded-xl w-40 h-14 text-xl hover:text-white transition-all'
+        onClick={() => {
+          navigate("/");
+        }}
+      >
+        Go Back
+      </button>
+      <ToastContainer />
     </div>
   );
 };

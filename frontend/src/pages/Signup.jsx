@@ -50,6 +50,15 @@ const Signup = () => {
       });
     }
   };
+  const validateName = (value) => {
+    const nameRegex = /^[A-Za-z]+$/i;
+    return nameRegex.test(value) || "Name must contain only alphabets";
+  };
+
+  const validateNumber = (value) => {
+    const numberRegex = /^[0-9]{10}$/;
+    return numberRegex.test(value) || "Number is not valid";
+  };
 
   const validateEmail = (value) => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -86,8 +95,9 @@ const Signup = () => {
                     </label>
                     <input
                       {...register("firstname", {
-                        required: "This input is required",
-                        pattern: /^[A-Za-z]+$/i,
+                        // required: "This input is required",
+
+                        validate: validateName,
                       })}
                       type='text'
                       className='focus:border-gray-800 px-2 border border-black rounded-xl w-[9rem] lg:w-[11rem] h-10'
@@ -108,7 +118,8 @@ const Signup = () => {
                     <input
                       {...register("lastname", {
                         required: "This input is required",
-                        pattern: /^[A-Za-z]+$/i,
+
+                        validate: validateName,
                       })}
                       className='focus:border-gray-800 px-2 border border-black rounded-xl w-[9rem] lg:w-[11rem] h-10'
                       type='text'
@@ -129,7 +140,7 @@ const Signup = () => {
                   </label>
                   <input
                     {...register("email", {
-                      required: "Email is required",
+                      // required: "Email is required",
                       validate: validateEmail,
                     })}
                     className='focus:border-gray-800 px-2 border border-black rounded-xl w-[18rem] lg:w-[22rem] h-10'
@@ -151,7 +162,8 @@ const Signup = () => {
                   <input
                     {...register("number", {
                       required: "This number is not valid",
-                      pattern: /^[0-9]{10}$/,
+                      // pattern: /^[0-9]{10}$/,
+                      validate: validateNumber,
                     })}
                     className='focus:border-gray-800 px-2 border border-black rounded-xl w-[18rem] lg:w-[22rem] h-10 remove-arrow'
                     type='number'

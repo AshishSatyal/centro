@@ -33,8 +33,15 @@ const AddProduct = () => {
   const validateStep = () => {
     switch (activeStep) {
       case 1:
-        if (!formdata.name || !formdata.price || !formdata.description) {
-          toast.error("Please fill in all required fields in Step 1.");
+        if (
+          !formdata.name ||
+          // formdata.name shouldnot have number or special characters in it  (eg: 1234, !@#$)
+          !/^[a-zA-Z\s]*$/.test(formdata.name) ||
+          !formdata.price ||
+          formdata.price < 0 ||
+          !formdata.description
+        ) {
+          toast.error("Form shouldnot be empty or filled incorrectly.");
           return false;
         }
         break;
@@ -45,8 +52,13 @@ const AddProduct = () => {
         }
         break;
       case 3:
-        if (!formdata.location || !formdata.locationDescription) {
-          toast.error("Please fill in all required fields in Step 3.");
+        if (
+          !formdata.location ||
+          !formdata.locationDescription ||
+          // formdata.locationDescription shouldnot have special characters in it  (eg: !@#$)
+          !/^[a-zA-Z0-9\s]+$/.test(formdata.locationDescription)
+        ) {
+          toast.error("Form cannot be empty or have special characters .");
           return false;
         }
         break;

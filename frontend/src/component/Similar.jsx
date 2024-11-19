@@ -23,10 +23,12 @@ const Similar = () => {
 
   const similarElements = similarProducts?.map((item) => {
     // console.log(item);
-    return <ProductItem key={item?.product_id} product={item} />; // Adding key prop
+    return (
+      <ProductItem key={item?.product_id} product={item} width={"w-[25rem]"} />
+    ); // Adding key prop
   });
 
-  return <div>{similarElements}</div>;
+  return <div className='flex flex-wrap gap-2'>{similarElements}</div>;
 };
 
 export default Similar;

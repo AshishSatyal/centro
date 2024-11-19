@@ -7,8 +7,9 @@ import { useUser } from "../context/UserContext";
 import ProductItem from "../component/ProductItem";
 import { locationNameAtom } from "./@state/state";
 import { useAtom } from "jotai";
+
 const MapWrapper = () => {
-  const center = [27.7159446, 85.329119];
+  const defaultCenter = [27.7159446, 85.329119];
   const navigate = useNavigate();
   const { id } = useParams();
   const axiosInstance = useAxios();
@@ -17,16 +18,13 @@ const MapWrapper = () => {
   const [locationName, setLocationName] = useAtom(locationNameAtom);
   const midlocation = locationName.split(",").slice(0, 4).join(",");
 
-  console.log(midlocation);
-
   const [mid, setMid] = useState({});
-  // const [locationName, setLocationName] = useState("");
-  const [product, setProduct] = useState({}); // Changed to an object
-  const [url, setUrl] = useState("");
+  const [product, setProduct] = useState({});
+  const [center, setCenter] = useState(defaultCenter); // Use state for map center
+
   useEffect(() => {
     const getMid = async () => {
       if (userDetail && userDetail.location) {
-        // Check if userDetail and location are defined
         const { latitude, longitude } = userDetail.location;
         try {
           const response = await axiosInstance.post(
@@ -38,6 +36,13 @@ const MapWrapper = () => {
             }
           );
           setMid(response.data);
+
+          // Update center to midpoint
+          setCenter([
+            response.data.midpoint_latitude || defaultCenter[0],
+            response.data.midpoint_longitude || defaultCenter[1],
+          ]);
+
           fetchLocationName(
             response.data.midpoint_latitude,
             response.data.midpoint_longitude
@@ -49,7 +54,7 @@ const MapWrapper = () => {
     };
 
     getMid();
-  }, [id, userDetail]); // Ensure userDetail is a dependency
+  }, [id, userDetail]); // Update center when `mid` changes
 
   const fetchLocationName = async (lat, lng) => {
     if (lat && lng) {
@@ -81,7 +86,7 @@ const MapWrapper = () => {
       }
     };
     getProduct();
-  }, [id]); // Ensure this fetches on id change
+  }, [id]);
 
   const initiateBuy = async () => {
     try {
@@ -96,11 +101,9 @@ const MapWrapper = () => {
       if (response.status === 200) {
         const paymentUrl = response.data?.payment_url;
         if (paymentUrl) {
-          // Ensure locationName is set before redirecting
           const currentLocationName = locationName;
-          setLocationName(currentLocationName); // Ensure it's up-to-date
-
-          window.location.href = paymentUrl; // Redirect directly to the payment URL
+          setLocationName(currentLocationName);
+          window.location.href = paymentUrl;
         } else {
           console.error("Payment URL not found.");
         }
@@ -109,7 +112,7 @@ const MapWrapper = () => {
       console.log("Error during purchase:", err);
     }
   };
-  const handleNavigate = () => {};
+
   const points = [
     {
       lat: mid.user_latitude || 0,
@@ -160,7 +163,7 @@ const MapWrapper = () => {
       <div className='w-2/3'>
         <MapContainer
           className='p-10 w-full h-[100vh]'
-          center={center}
+          center={center} // Dynamically updated center
           zoom={15}
           scrollWheelZoom={false}
         >
