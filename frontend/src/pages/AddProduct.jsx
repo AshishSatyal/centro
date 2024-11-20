@@ -36,10 +36,12 @@ const AddProduct = () => {
         if (
           !formdata.name ||
           // formdata.name shouldnot have number or special characters in it  (eg: 1234, !@#$)
-          !/^[a-zA-Z\s]*$/.test(formdata.name) ||
+          !/^[a-zA-Z0-9\s]+$/.test(formdata.name) ||
           !formdata.price ||
           formdata.price < 0 ||
-          !formdata.description
+          !formdata.description ||
+          // formdata.image shouldnot be empty  (eg: !@#$)
+          !formdata.image
         ) {
           toast.error("Form shouldnot be empty or filled incorrectly.");
           return false;

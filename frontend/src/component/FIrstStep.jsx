@@ -44,6 +44,7 @@ const FIrstStep = ({ values, handleChange, handleImageUpload }) => {
         <label htmlFor='image'>Upload Image</label>
         <input
           type='file'
+          required
           name='image'
           id='image'
           accept='image/*'
