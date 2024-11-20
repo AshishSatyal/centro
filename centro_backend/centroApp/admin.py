@@ -5,20 +5,20 @@ from .models import User,Product,PasswordReset,UserLocation,Comment,Transaction,
 
 class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
-    list_display = ('email', 'firstname','lastname','number', 'is_staff', 'is_superuser')
+    list_display = ('email', 'firstname', 'lastname', 'number', 'is_staff', 'is_superuser')
     list_filter = ('is_staff', 'is_superuser')
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('firstname','lastname')}),
+        ('Personal info', {'fields': ('firstname', 'lastname', 'number')}),
         ('Permissions', {'fields': ('is_staff', 'is_superuser')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'firstname','lastname', 'password1', 'password2'),
+            'fields': ('email', 'firstname', 'lastname', 'number', 'password1', 'password2'),
         }),
     )
-    search_fields = ('email', 'firstname','lastname')
+    search_fields = ('email', 'firstname', 'lastname', 'number')
     ordering = ('email',)
     filter_horizontal = ()
 

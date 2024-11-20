@@ -724,17 +724,20 @@ class ValidatePaymentView(APIView):
 
             # Send email to buyer
             self.send_email(user.email, user.firstname, user.lastname, product.name, 
-                            midpoint)
+                            midpoint, request.user.number, product.userName.number)
 
             # Send email to seller
             seller_email = product.userName.email
             seller_phone = product.userName.number
-            self.send_email(seller_email, product.userName.firstname, product.userName.lastname, product.name, midpoint, seller_phone, request.user.number)
+            self.send_email(seller_email, product.userName.firstname, product.userName.lastname, product.name, midpoint, request.user.number, seller_phone)
 
 
             return Response({'status': 'Payment successful. Transaction recorded!'}, status=200)
         else:
             return Response({'error': 'Payment not completed.'}, status=400)
+        
+        print(f'Seller phone: {product.userName.number}')
+        print(f'Buyer phone: {user.number}')
         
     def send_email(self, recipient_email, first_name, last_name, product_name, midpoint, seller_phone, buyer_phone):
             subject = "Payment Successful | Meeting Point"
